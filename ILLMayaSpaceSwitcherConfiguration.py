@@ -13,7 +13,7 @@ from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
 from functools import partial  # optional, for passing args during signal function calls
 import sys
 import pathlib
-
+import Util
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherConfiguration")
@@ -43,6 +43,9 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         Initialize class.
         """
         super(ILLMayaSpaceSwitcherConfiguration, self).__init__(parent=parent)
+
+        self.selectedControl: str = None
+
         self.setWindowFlags(QtCore.Qt.Window)
         self.widgetPath = str(pathlib.Path(__file__).parent.resolve())
         self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\ILLMayaSpaceSwitcherConfiguration.ui')
@@ -60,29 +63,29 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
                 self.resize(800, 480)
 
         # Selected Control Label
-        self.lbl_selectedControl = self.widget.findChild(QtWidgets.QLabel, 'lbl_selectedControl')
+        self.lbl_selectedControl: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_selectedControl')
 
         # Refresh Button
-        self.btn_refresh = self.widget.findChild(QtWidgets.QPushButton, 'btn_refresh')
+        self.btn_refresh: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_refresh')
         self.btn_refresh.clicked.connect(self.refreshPressed)
 
         # Generate Default JSON Button
-        self.btn_generateDefaultJsonContents = self.widget.findChild(QtWidgets.QPushButton, 'btn_generateDefaultJsonContents')
+        self.btn_generateDefaultJsonContents: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_generateDefaultJsonContents')
         self.btn_generateDefaultJsonContents.clicked.connect(self.generateDefaultJsonContentsPressed)
 
         # JSON Contents Editor
-        self.te_jsonContents = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_jsonContents')
+        self.te_jsonContents: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_jsonContents')
 
         # Set Space Configuration on Control Button
-        self.btn_set = self.widget.findChild(QtWidgets.QPushButton, 'btn_set')
+        self.btn_set: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_set')
         self.btn_set.clicked.connect(self.setPressed)
 
         # Get Selected Object Name Button
-        self.btn_getSelectedObjectName = self.widget.findChild(QtWidgets.QPushButton, 'btn_getSelectedObjectName')
+        self.btn_getSelectedObjectName: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_getSelectedObjectName')
         self.btn_getSelectedObjectName.clicked.connect(self.getSelectedObjectNamePressed)
 
         # Selection Name Line Edit
-        self.le_selectionName = self.widget.findChild(QtWidgets.QLineEdit, 'le_selectionName')
+        self.le_selectionName: QtWidgets.QLineEdit = self.widget.findChild(QtWidgets.QLineEdit, 'le_selectionName')
 
     def resizeEvent(self, event):
         """
@@ -103,7 +106,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         self.destroy()
 
     def refreshPressed(self):
-        print("Refresh")
+        self.setSelectedControl(Util.getSelectedTransform())
 
     def generateDefaultJsonContentsPressed(self):
         print("Generate Default Contents")
@@ -112,4 +115,11 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         print("Set")
 
     def getSelectedObjectNamePressed(self):
-        print("Get Selected Object Name")
+        self.le_selectionName.setText(Util.getSelectedTransform())
+
+    def setSelectedControl(self, selectedControl):
+        self.selectedControl = selectedControl
+
+        print("Setting selected control " + selectedControl)
+
+        self.lbl_selectedControl.setText(Util.getShortName(self.selectedControl))

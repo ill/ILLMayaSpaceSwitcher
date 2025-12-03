@@ -1,7 +1,9 @@
+import Util
 import ILLMayaSpaceSwitcherConfiguration
 
 # For Development
 from importlib import reload
+reload(Util)
 reload(ILLMayaSpaceSwitcherConfiguration)
 
 # ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.wipeSettings()
