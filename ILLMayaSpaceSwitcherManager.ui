@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>SpaceSwitcherManager</class>
+ <widget class="QWidget" name="SpaceSwitcherManager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -26,7 +26,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>48</height>
+       <height>64</height>
       </size>
      </property>
      <property name="widgetResizable">
@@ -38,7 +38,7 @@
         <x>0</x>
         <y>0</y>
         <width>370</width>
-        <height>46</height>
+        <height>62</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -82,7 +82,7 @@
         <x>0</x>
         <y>0</y>
         <width>370</width>
-        <height>286</height>
+        <height>270</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3"/>
