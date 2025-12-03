@@ -23,8 +23,6 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
     @staticmethod
     def openMayaMainToolWindowInstance():
-        print("Launching")
-
         if ILLMayaSpaceSwitcherManager.INSTANCE is None or not ILLMayaSpaceSwitcherManager.INSTANCE.isVisible():
             mayaMainWindowPtr = omui.MQtUtil.mainWindow()
             mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QtWidgets.QWidget)

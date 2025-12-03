@@ -23,8 +23,6 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
     @staticmethod
     def openMayaMainToolWindowInstance():
-        print("Launching")
-
         if ILLMayaSpaceSwitcherConfiguration.INSTANCE is None or not ILLMayaSpaceSwitcherConfiguration.INSTANCE.isVisible():
             mayaMainWindowPtr = omui.MQtUtil.mainWindow()
             mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QtWidgets.QWidget)
@@ -61,6 +59,31 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             except Exception as e:
                 self.resize(800, 480)
 
+        # Selected Control Label
+        self.lbl_selectedControl = self.widget.findChild(QtWidgets.QLabel, 'lbl_selectedControl')
+
+        # Refresh Button
+        self.btn_refresh = self.widget.findChild(QtWidgets.QPushButton, 'btn_refresh')
+        self.btn_refresh.clicked.connect(self.refreshPressed)
+
+        # Generate Default JSON Button
+        self.btn_generateDefaultJsonContents = self.widget.findChild(QtWidgets.QPushButton, 'btn_generateDefaultJsonContents')
+        self.btn_generateDefaultJsonContents.clicked.connect(self.generateDefaultJsonContentsPressed)
+
+        # JSON Contents Editor
+        self.te_jsonContents = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_jsonContents')
+
+        # Set Space Configuration on Control Button
+        self.btn_set = self.widget.findChild(QtWidgets.QPushButton, 'btn_set')
+        self.btn_set.clicked.connect(self.setPressed)
+
+        # Get Selected Object Name Button
+        self.btn_getSelectedObjectName = self.widget.findChild(QtWidgets.QPushButton, 'btn_getSelectedObjectName')
+        self.btn_getSelectedObjectName.clicked.connect(self.getSelectedObjectNamePressed)
+
+        # Selection Name Line Edit
+        self.le_selectionName = self.widget.findChild(QtWidgets.QLineEdit, 'le_selectionName')
+
     def resizeEvent(self, event):
         """
         Called on automatically generated resize event
@@ -79,3 +102,14 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
         self.destroy()
 
+    def refreshPressed(self):
+        print("Refresh")
+
+    def generateDefaultJsonContentsPressed(self):
+        print("Generate Default Contents")
+
+    def setPressed(self):
+        print("Set")
+
+    def getSelectedObjectNamePressed(self):
+        print("Get Selected Object Name")
