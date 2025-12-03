@@ -4,4 +4,4 @@ import ILLMayaSpaceSwitcherMainToolWindow
 from importlib import reload
 reload(ILLMayaSpaceSwitcherMainToolWindow)
 
-ILLMayaSpaceSwitcherMainToolWindow.ILLMayaSpaceSwitcherMainToolWindow.open_maya_main_tool_window_instance()
+ILLMayaSpaceSwitcherMainToolWindow.ILLMayaSpaceSwitcherMainToolWindow.openMayaMainToolWindowInstance()

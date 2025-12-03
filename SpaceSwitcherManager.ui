@@ -23,6 +23,12 @@
    </item>
    <item>
     <widget class="QScrollArea" name="sa_selectedControlsList">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>48</height>
+      </size>
+     </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
@@ -32,7 +38,7 @@
         <x>0</x>
         <y>0</y>
         <width>370</width>
-        <height>166</height>
+        <height>46</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -76,7 +82,7 @@
         <x>0</x>
         <y>0</y>
         <width>370</width>
-        <height>166</height>
+        <height>286</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3"/>

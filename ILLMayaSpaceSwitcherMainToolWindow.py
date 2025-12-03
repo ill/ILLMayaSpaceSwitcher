@@ -12,15 +12,24 @@ import pathlib
 
 
 class ILLMayaSpaceSwitcherMainToolWindow(QtWidgets.QWidget):
+    SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherMainToolWindow")
+    GEOMETRY_SETTING = "geometry"
+
+    INSTANCE = None
 
     @staticmethod
-    def open_maya_main_tool_window_instance():
-        # QtWidgets.QApplication(sys.argv)
-        maya_main_window_ptr = omui.MQtUtil.mainWindow()
-        maya_main_window = wrapInstance(int(maya_main_window_ptr), QtWidgets.QWidget)
-        window = ILLMayaSpaceSwitcherMainToolWindow(parent=maya_main_window)
-        window.setWindowTitle('Space Switcher')
-        window.show()
+    def openMayaMainToolWindowInstance():
+        print("Launching")
+
+        if ILLMayaSpaceSwitcherMainToolWindow.INSTANCE is None or not ILLMayaSpaceSwitcherMainToolWindow.INSTANCE.isVisible():
+            mayaMainWindowPtr = omui.MQtUtil.mainWindow()
+            mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QtWidgets.QWidget)
+            ILLMayaSpaceSwitcherMainToolWindow.INSTANCE = ILLMayaSpaceSwitcherMainToolWindow(parent=mayaMainWindow)
+            ILLMayaSpaceSwitcherMainToolWindow.INSTANCE.setWindowTitle('Space Switcher')
+
+        ILLMayaSpaceSwitcherMainToolWindow.INSTANCE.show()
+        ILLMayaSpaceSwitcherMainToolWindow.INSTANCE.raise_()
+        ILLMayaSpaceSwitcherMainToolWindow.INSTANCE.activateWindow()
 
     def __init__(self, parent=None):
         """
@@ -32,5 +41,29 @@ class ILLMayaSpaceSwitcherMainToolWindow(QtWidgets.QWidget):
         self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\SpaceSwitcherManager.ui')
         self.widget.setParent(self)
 
-def thing():
-    print("OPEN THE THING")
+        # set initial window sizes
+        restoredGeometry = ILLMayaSpaceSwitcherMainToolWindow.SETTINGS.value(ILLMayaSpaceSwitcherMainToolWindow.GEOMETRY_SETTING, None)
+
+        try:
+            self.restoreGeometry(restoredGeometry)
+        except Exception as e:
+            self.resize(800, 480)
+
+    def resizeEvent(self, event):
+        """
+        Called on automatically generated resize event
+        """
+        self.widget.resize(self.width(), self.height())
+
+    def closeEvent(self, event):
+        """
+        Close window.
+        """
+
+        ILLMayaSpaceSwitcherMainToolWindow.SETTINGS.setValue(ILLMayaSpaceSwitcherMainToolWindow.GEOMETRY_SETTING, self.saveGeometry())
+
+        if ILLMayaSpaceSwitcherMainToolWindow.INSTANCE == self:
+            ILLMayaSpaceSwitcherMainToolWindow.INSTANCE = None
+
+        self.destroy()
+
