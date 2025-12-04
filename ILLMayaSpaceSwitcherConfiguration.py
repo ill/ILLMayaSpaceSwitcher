@@ -19,19 +19,19 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherConfiguration")
     GEOMETRY_SETTING = "geometry"
 
-    INSTANCE = None
-
     @staticmethod
     def openMayaMainToolWindowInstance():
-        if ILLMayaSpaceSwitcherConfiguration.INSTANCE is None or not ILLMayaSpaceSwitcherConfiguration.INSTANCE.isVisible():
-            mayaMainWindowPtr = omui.MQtUtil.mainWindow()
-            mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QtWidgets.QWidget)
-            ILLMayaSpaceSwitcherConfiguration.INSTANCE = ILLMayaSpaceSwitcherConfiguration(parent=mayaMainWindow)
-            ILLMayaSpaceSwitcherConfiguration.INSTANCE.setWindowTitle('Space Switcher Configuration')
+        mayaMainWindowPtr = omui.MQtUtil.mainWindow()
+        mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QtWidgets.QWidget)
 
-        ILLMayaSpaceSwitcherConfiguration.INSTANCE.show()
-        ILLMayaSpaceSwitcherConfiguration.INSTANCE.raise_()
-        ILLMayaSpaceSwitcherConfiguration.INSTANCE.activateWindow()
+        instance = ILLMayaSpaceSwitcherConfiguration(parent=mayaMainWindow)
+        instance.setWindowTitle('Space Switcher Configuration')
+
+        instance.show()
+        instance.raise_()
+        instance.activateWindow()
+
+        return instance
 
     @staticmethod
     def wipeSettings():
@@ -99,9 +99,6 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         """
 
         ILLMayaSpaceSwitcherConfiguration.SETTINGS.setValue(ILLMayaSpaceSwitcherConfiguration.GEOMETRY_SETTING, self.saveGeometry())
-
-        if ILLMayaSpaceSwitcherConfiguration.INSTANCE == self:
-            ILLMayaSpaceSwitcherConfiguration.INSTANCE = None
 
         self.destroy()
 
