@@ -1,11 +1,11 @@
 import maya.cmds as cmds
-import maya.mel as mel
 
 def getSelectedTransforms():
     return cmds.ls(sl=True, dag=True, type='transform', long=True)
 
 def getSelectedTransform():
-    return getSelectedTransforms()[0]
+    selectedTransforms = getSelectedTransforms()
+    return getSelectedTransforms()[0] if len(selectedTransforms) > 0 else None
 
 def getShortName(longName):
     return cmds.ls(longName, sn=True)[0]

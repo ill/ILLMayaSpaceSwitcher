@@ -3,7 +3,6 @@
 # ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.openMayaMainToolWindowInstance()
 
 import maya.cmds as cmds
-import maya.mel as mel
 from maya import OpenMayaUI as omui
 # TODO: Figure out maya < 2025 and >= 2025 support
 # from shiboken2 import wrapInstance
@@ -13,7 +12,10 @@ from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
 from functools import partial  # optional, for passing args during signal function calls
 import sys
 import pathlib
+from typing import Optional
+
 import Util
+import ILLMayaSpaceSwitcherModel
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherConfiguration")
@@ -44,7 +46,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         """
         super(ILLMayaSpaceSwitcherConfiguration, self).__init__(parent=parent)
 
-        self.selectedControl: str = None
+        self.selectedControl: Optional[str] = None
 
         self.setWindowFlags(QtCore.Qt.Window)
         self.widgetPath = str(pathlib.Path(__file__).parent.resolve())
@@ -106,10 +108,21 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         self.setSelectedControl(Util.getSelectedTransform())
 
     def generateDefaultJsonContentsPressed(self):
-        print("Generate Default Contents")
+        self.te_jsonContents.setPlainText(
+            '{\n'
+            '\t"groupName":{\n'
+            '\t\t"attrName":{\n'
+            '\t\t\t"transformName":"COG_CTRL__space_world__LOC"\n'
+            '\t\t}\n'
+            '\t}\n'
+            '}'
+        )
 
     def setPressed(self):
-        print("Set")
+        if self.selectedControl is not None:
+            spaces = ILLMayaSpaceSwitcherModel.Spaces.fromJsonStr(self.selectedControl, self.te_jsonContents.toPlainText())
+
+            print(spaces)
 
     def getSelectedObjectNamePressed(self):
         self.le_selectionName.setText(Util.getSelectedTransform())

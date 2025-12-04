@@ -1,10 +1,9 @@
-import Util
 import ILLMayaSpaceSwitcherManager
 
 # For Development
+import DevReloader
 from importlib import reload
-reload(Util)
-reload(ILLMayaSpaceSwitcherManager)
+reload(DevReloader)
 
 # ILLMayaSpaceSwitcherManager.ILLMayaSpaceSwitcherManager.wipeSettings()
 ILLMayaSpaceSwitcherManager.ILLMayaSpaceSwitcherManager.openMayaMainToolWindowInstance()
