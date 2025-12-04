@@ -3,6 +3,8 @@ import maya.cmds as cmds
 
 import Util
 
+ILLMayaSpaceSwitcherConfigAttributeName: str = 'ILLMayaSpaceSwitcherConfig'
+
 # A definition of an individual space
 class Space:
     def __init__(self,
@@ -26,12 +28,12 @@ class Space:
         if not cmds.attributeQuery(attributeName, node=controlName, exists=True):
             raise AttributeError(f'No attribute "{attributeName}" on control "{controlName}"')
 
-        transformName = jsonData["transformName"]
+        transformName = jsonData['transformName']
 
         if not cmds.objExists(transformName):
             raise NameError(f'No object "{transformName}" exists in the scene')
 
-        if not cmds.nodeType(transformName) == "transform":
+        if not cmds.nodeType(transformName) == 'transform':
             raise TypeError(f'Object "{transformName}" is not a transform type')
 
         if not Util.isLongName(transformName):
@@ -39,7 +41,7 @@ class Space:
 
         return cls(name=cmds.attributeQuery(attributeName, node=controlName, niceName=True),
                    attributeName=attributeName,
-                   transformName=jsonData["transformName"])
+                   transformName=transformName)
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group

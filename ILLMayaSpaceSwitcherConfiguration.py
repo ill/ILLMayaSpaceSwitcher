@@ -114,9 +114,9 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     def generateDefaultJsonContentsPressed(self):
         self.te_jsonContents.setPlainText(
             '{\n'
-            '\t"groupName":{\n'
-            '\t\t"attrName":{\n'
-            '\t\t\t"transformName":"COG_CTRL__space_world__LOC"\n'
+            '\t"Group Name e.g (Spaces)":{\n'
+            '\t\t"Internal Attribute Name (Not Nice Name)":{\n'
+            '\t\t\t"transformName":"|LongName|COG_CTRL__space_world__LOC"\n'
             '\t\t}\n'
             '\t}\n'
             '}'
@@ -130,7 +130,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         try:
             ILLMayaSpaceSwitcherModel.Spaces.fromJsonStr(self.selectedControl, self.te_jsonContents.toPlainText())
         except Exception as e:
-            QtWidgets.QMessageBox.warning(self, 'Error', f'Validation failed: {type(e).__name__,} {e}')
+            QtWidgets.QMessageBox.warning(self, 'Error', f'Validation failed: {type(e).__name__}\n\n{e}')
             return False
 
         return True
@@ -141,8 +141,17 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
     def setPressed(self):
         if self.validate():
-            # TODO: set the attribute
-            pass
+            if not cmds.attributeQuery(ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName, node=self.selectedControl, exists=True):
+                cmds.addAttr(self.selectedControl,
+                             longName=ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName,
+                             dataType='string',
+                             hidden=True,
+                             keyable=False)
+            elif not cmds.attributeQuery(ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName, node=self.selectedControl, attributeType=True) == 'string':
+                QtWidgets.QMessageBox.warning(self, 'Error', f'Attribute "{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}" on "{self.selectedControl}" exists but is not of string type. Delete it to proceed.')
+                return
+
+            cmds.setAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}', self.te_jsonContents.toPlainText(), type='string')
 
     def getSelectedObjectNamePressed(self):
         self.le_selectionName.setText(Util.getSelectedTransform())
@@ -153,3 +162,12 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         print("Setting selected control " + selectedControl)
 
         self.lbl_selectedControl.setText(Util.getShortName(self.selectedControl))
+
+
+{
+	"groupName":{
+		"SpaceRigMain":{
+			"transformName":"|UE5Manny_GRP|spaces_GRP|space_rig_main_GRP|hand_l_IK_CTRL__space_rig_main__LOC"
+		}
+	}
+}
