@@ -9,3 +9,6 @@ def getSelectedTransform():
 
 def getShortName(longName):
     return cmds.ls(longName, sn=True)[0]
+
+def isLongName(name: str) -> bool:
+    return "|" in name

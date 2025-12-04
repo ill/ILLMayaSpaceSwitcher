@@ -1,6 +1,8 @@
 import json
 import maya.cmds as cmds
 
+import Util
+
 # A definition of an individual space
 class Space:
     def __init__(self,
@@ -17,13 +19,27 @@ class Space:
         self.transformName: str = transformName
 
     @classmethod
-    def fromJsonData(cls, control: str, attributeName: str, jsonData: {}):
-        if not cmds.attributeQuery(attributeName, node=control, exists=True):
-            raise ValueError(f'No attribute: {attributeName} on control: {control}')
+    def fromJsonData(cls, controlName: str, attributeName: str, jsonData: {}):
+        if not Util.isLongName(controlName):
+            raise NameError(f'Use long names only for control name "{controlName}"')
 
-        return Space(name=cmds.attributeQuery(attributeName, node=control, niceName=True),
-                     attributeName=attributeName,
-                     transformName=jsonData["transformName"])
+        if not cmds.attributeQuery(attributeName, node=controlName, exists=True):
+            raise AttributeError(f'No attribute "{attributeName}" on control "{controlName}"')
+
+        transformName = jsonData["transformName"]
+
+        if not cmds.objExists(transformName):
+            raise NameError(f'No object "{transformName}" exists in the scene')
+
+        if not cmds.nodeType(transformName) == "transform":
+            raise TypeError(f'Object "{transformName}" is not a transform type')
+
+        if not Util.isLongName(transformName):
+            raise NameError(f'Use long names only for transform "{transformName}"')
+
+        return cls(name=cmds.attributeQuery(attributeName, node=controlName, niceName=True),
+                   attributeName=attributeName,
+                   transformName=jsonData["transformName"])
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
@@ -31,27 +47,43 @@ class SpaceGroup:
     def __init__(self,
                  name: str = '',
                  spaces: list[Space] = ()):
-        self.name = name
+        # Name of the space group
+        self.name: str = name
+
+        # The spaces themselves
         self.spaces: list[Space] = spaces
 
     @classmethod
-    def fromJsonData(cls, control: str, name: str, jsonData: {}):
-        return cls(name=name, spaces=[Space.fromJsonData(control=control, attributeName=attributeName, jsonData=spaceJsonData)
-                                      for attributeName, spaceJsonData in jsonData.items()])
+    def fromJsonData(cls, controlName: str, name: str, jsonData: {}):
+        if not Util.isLongName(controlName):
+            raise NameError(f'Use long names only for control name "{controlName}"')
+
+        return cls(name=name,
+                   spaces=[Space.fromJsonData(controlName=controlName, attributeName=attributeName, jsonData=spaceJsonData)
+                           for attributeName, spaceJsonData in jsonData.items()])
 
 # Represents the definition of a single control's collection of spaces
 class Spaces:
     def __init__(self,
+                 controlName: str,
                  spaceGroups: list[SpaceGroup] = ()):
+        # The control name the spaces are on
+        self.controlName: str = controlName
+
+        # The space groups in this spaces collection
         self.spaceGroups: list[SpaceGroup] = spaceGroups
 
     @classmethod
-    def fromJsonStr(cls, control: str, jsonStr: str):
-        return cls.fromJsonData(control=control, jsonData = json.loads(jsonStr))
+    def fromJsonStr(cls, controlName: str, jsonStr: str):
+        return cls.fromJsonData(controlName=controlName, jsonData = json.loads(jsonStr))
 
     @classmethod
-    def fromJsonData(cls, control: str, jsonData: {}):
-        return cls(spaceGroups=[SpaceGroup.fromJsonData(control=control, name=groupName, jsonData=groupJsonData)
+    def fromJsonData(cls, controlName: str, jsonData: {}):
+        if not Util.isLongName(controlName):
+            raise NameError(f'Use long names only for control name "{controlName}"')
+
+        return cls(controlName=controlName,
+                   spaceGroups=[SpaceGroup.fromJsonData(controlName=controlName, name=groupName, jsonData=groupJsonData)
                                 for groupName, groupJsonData in jsonData.items()])
 
 
