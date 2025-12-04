@@ -73,11 +73,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btn_set">
-     <property name="text">
-      <string>Set Space Configuration on Control</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="hl_set">
+     <item>
+      <widget class="QPushButton" name="btn_validate">
+       <property name="text">
+        <string>Validate JSON</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_set">
+       <property name="text">
+        <string>Set Space Configuration on Control</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="hl_selectedObject">

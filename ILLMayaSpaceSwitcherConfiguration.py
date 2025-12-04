@@ -61,7 +61,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         else:
             try:
                 self.restoreGeometry(restoredGeometry)
-            except Exception as e:
+            except Exception:
                 self.resize(800, 480)
 
         # Selected Control Label
@@ -77,6 +77,10 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
         # JSON Contents Editor
         self.te_jsonContents: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_jsonContents')
+
+        # Validate JSON Button
+        self.btn_validate: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_validate')
+        self.btn_validate.clicked.connect(self.validatePressed)
 
         # Set Space Configuration on Control Button
         self.btn_set: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_set')
@@ -118,11 +122,27 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             '}'
         )
 
-    def setPressed(self):
-        if self.selectedControl is not None:
-            spaces = ILLMayaSpaceSwitcherModel.Spaces.fromJsonStr(self.selectedControl, self.te_jsonContents.toPlainText())
+    def validate(self):
+        if self.selectedControl is None:
+            QtWidgets.QMessageBox.warning(self, 'Error', 'Select a rig control and press refresh.')
+            return False
 
-            print(spaces)
+        try:
+            ILLMayaSpaceSwitcherModel.Spaces.fromJsonStr(self.selectedControl, self.te_jsonContents.toPlainText())
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, 'Error', f'Validation failed: {type(e).__name__,} {e}')
+            return False
+
+        return True
+
+    def validatePressed(self):
+        if self.validate():
+            QtWidgets.QMessageBox.information(self, 'Success', 'Validation succeeded')
+
+    def setPressed(self):
+        if self.validate():
+            # TODO: set the attribute
+            pass
 
     def getSelectedObjectNamePressed(self):
         self.le_selectionName.setText(Util.getSelectedTransform())
