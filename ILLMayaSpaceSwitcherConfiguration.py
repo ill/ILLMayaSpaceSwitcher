@@ -20,6 +20,7 @@ import ILLMayaSpaceSwitcherModel
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherConfiguration")
     GEOMETRY_SETTING = "geometry"
+    SPLITTER_SETTING = "splitter"
 
     @staticmethod
     def openMayaMainToolWindowInstance():
@@ -53,17 +54,6 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\ILLMayaSpaceSwitcherConfiguration.ui')
         self.widget.setParent(self)
 
-        # set initial window sizes
-        restoredGeometry = ILLMayaSpaceSwitcherConfiguration.SETTINGS.value(ILLMayaSpaceSwitcherConfiguration.GEOMETRY_SETTING, None)
-
-        if restoredGeometry is None:
-            self.resize(800, 480)
-        else:
-            try:
-                self.restoreGeometry(restoredGeometry)
-            except Exception:
-                self.resize(800, 480)
-
         # Selected Control Label
         self.lbl_selectedControl: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_selectedControl')
 
@@ -93,12 +83,37 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         # Selection Name Line Edit
         self.le_selectionName: QtWidgets.QLineEdit = self.widget.findChild(QtWidgets.QLineEdit, 'le_selectionName')
 
+        # Splitter
+        self.splitter: QtWidgets.QSplitter = self.widget.findChild(QtWidgets.QSplitter, 'splitter')
+
         # Get Selected Control Attributes Button
         self.btn_getSelectedControlAttributes: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_getSelectedControlAttributes')
         self.btn_getSelectedControlAttributes.clicked.connect(self.getSelectedControlAttributesPressed)
 
         # Selected Control Attributes Editor
         self.te_selectedControlAttributes: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_selectedControlAttributes')
+
+
+        # set initial window geometry
+        restoredGeometry = ILLMayaSpaceSwitcherConfiguration.SETTINGS.value(
+            ILLMayaSpaceSwitcherConfiguration.GEOMETRY_SETTING, None)
+
+        if restoredGeometry is None:
+            self.resize(800, 480)
+        else:
+            try:
+                self.restoreGeometry(restoredGeometry)
+            except Exception:
+                self.resize(800, 480)
+
+        restoredSplitter = ILLMayaSpaceSwitcherConfiguration.SETTINGS.value(
+            ILLMayaSpaceSwitcherConfiguration.SPLITTER_SETTING, None)
+
+        if restoredSplitter is not None:
+            try:
+                self.splitter.restoreState(restoredSplitter)
+            except Exception:
+                pass
 
     def resizeEvent(self, event):
         """
@@ -112,6 +127,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         """
 
         ILLMayaSpaceSwitcherConfiguration.SETTINGS.setValue(ILLMayaSpaceSwitcherConfiguration.GEOMETRY_SETTING, self.saveGeometry())
+        ILLMayaSpaceSwitcherConfiguration.SETTINGS.setValue(ILLMayaSpaceSwitcherConfiguration.SPLITTER_SETTING, self.splitter.saveState())
 
         self.destroy()
 
