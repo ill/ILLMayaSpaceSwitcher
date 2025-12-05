@@ -51,7 +51,7 @@
          <item>
           <widget class="QPushButton" name="btn_generateDefaultJsonContents">
            <property name="text">
-            <string>Generate Default JSON</string>
+            <string>Generate Sample JSON</string>
            </property>
           </widget>
          </item>

@@ -70,6 +70,8 @@ class SpaceGroup:
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
+        # We expect a bool field named hasBaseSpace to determine if the first space is a base space
+
         return cls(name=name,
                    spaces=[Space.baseFromJsonData(controlName=controlName, baseSpaceName=attributeOrBaseSpaceName, jsonData=spaceJsonData)
                            if index == 0 else
