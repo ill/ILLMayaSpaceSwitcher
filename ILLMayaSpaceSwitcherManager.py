@@ -15,6 +15,7 @@ import sys
 import pathlib
 
 import Util
+import ILLMayaSpaceSwitcherModel
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherManager")
@@ -46,6 +47,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         super(ILLMayaSpaceSwitcherManager, self).__init__(parent=parent)
 
         self.selectedControls: list[str] = None
+        self.spacesUnion: ILLMayaSpaceSwitcherModel.SpacesUnion() = None
 
         self.setWindowFlags(QtCore.Qt.Window)
         self.widgetPath = str(pathlib.Path(__file__).parent.resolve())
@@ -108,3 +110,12 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
             return
 
         self.lbl_selectedControlsList.setText(', '.join([Util.getShortName(selectedControl) for selectedControl in self.selectedControls]))
+
+        # go through each control and build the union of spaces
+        spacesUnion = ILLMayaSpaceSwitcherModel.SpacesUnion()
+        for spaces in [ILLMayaSpaceSwitcherModel.Spaces.fromControl(selectedControl) for selectedControl in self.selectedControls]:
+            spacesUnion.addSpaces(spaces)
+
+        spacesUnion.evaluateSpaces()
+
+        # update the spaces UI

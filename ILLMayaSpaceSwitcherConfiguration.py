@@ -225,10 +225,4 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
         self.lbl_selectedControl.setText(f'Selected Control: {Util.getShortName(self.selectedControl)}')
 
-        if cmds.attributeQuery(ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName,
-                                       node=self.selectedControl,
-                                       exists=True)\
-            and cmds.getAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}', type=True) == 'string':
-            self.te_jsonContents.setPlainText(cmds.getAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}'))
-        else:
-            self.te_jsonContents.setPlainText(None)
+        self.te_jsonContents.setPlainText(ILLMayaSpaceSwitcherModel.Spaces.getJsonStrFromControl(self.selectedControl))

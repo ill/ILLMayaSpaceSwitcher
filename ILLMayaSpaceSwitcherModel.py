@@ -91,6 +91,22 @@ class Spaces:
         # The rotation only spaces
         self.rotationSpaces: SpaceGroup = rotationSpaces
 
+    @staticmethod
+    def getJsonStrFromControl(controlName: str) -> str:
+        if (controlName is not None
+                and cmds.attributeQuery(ILLMayaSpaceSwitcherConfigAttributeName,
+                                        node=controlName,
+                                        exists=True)
+                and cmds.getAttr(f'{controlName}.{ILLMayaSpaceSwitcherConfigAttributeName}',
+                                 type=True) == 'string'):
+            return cmds.getAttr(f'{controlName}.{ILLMayaSpaceSwitcherConfigAttributeName}')
+        else:
+            return None
+
+    @classmethod
+    def fromControl(cls, controlName: str):
+        return cls.fromJsonStr(controlName=controlName, jsonStr=cls.getJsonStrFromControl(controlName=controlName))
+
     @classmethod
     def fromJsonStr(cls, controlName: str, jsonStr: str):
         return cls.fromJsonData(controlName=controlName, jsonData = json.loads(jsonStr))
