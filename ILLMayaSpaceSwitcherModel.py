@@ -80,12 +80,16 @@ class SpaceGroup:
 class Spaces:
     def __init__(self,
                  controlName: str = None,
-                 spaceGroups: list[SpaceGroup] = None):
+                 spaces: SpaceGroup = None,
+                 rotationSpaces: SpaceGroup = None):
         # The control name the spaces are on
         self.controlName: str = controlName
 
-        # The space groups in this spaces collection
-        self.spaceGroups: list[SpaceGroup] = spaceGroups
+        # The main spaces
+        self.spaces: SpaceGroup = spaces
+
+        # The rotation only spaces
+        self.rotationSpaces: SpaceGroup = rotationSpaces
 
     @classmethod
     def fromJsonStr(cls, controlName: str, jsonStr: str):
@@ -96,14 +100,19 @@ class Spaces:
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
+        spacesJsonData = jsonData.get("Spaces", None)
+        rotationSpacesJsonData = jsonData.get("Rotation Spaces", None)
+
         return cls(controlName=controlName,
-                   spaceGroups=[SpaceGroup.fromJsonData(controlName=controlName, name=groupName, jsonData=groupJsonData)
-                                for groupName, groupJsonData in jsonData.items()])
+                   spaces=SpaceGroup.fromJsonData(controlName=controlName, name="Spaces", jsonData=spacesJsonData) if spacesJsonData is not None else None,
+                   rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name="Rotation Spaces", jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
 
+class SpacesUnionListEntry:
+    def __init__(self):
+        self.spaces: list[Space] = None
 
-
-# When working with multiple selected controls, this tracks the merged version where two objects have the same order of spaces within the groups
-class MergedSpaces:
+# When working with multiple selected controls, this tracks the union of what the selected spaces are among the objects as long as their space names match and are in the same order
+class SpacesUnion:
     def __init__(self):
         self.spaces: set[Spaces] = set()
 
@@ -114,8 +123,6 @@ class MergedSpaces:
         if spacesNum == len(self.spaces):
             return False
 
-        # TODO: Reevaluate the merged spaces
-
         return True
 
     def removeSpaces(self, spaces:Spaces) -> bool:
@@ -125,6 +132,7 @@ class MergedSpaces:
         if spacesNum == len(self.spaces):
             return False
 
-        # TODO: Reevaluate the merged spaces
-
         return True
+
+    def evaluateSpaces(self):
+        pass
