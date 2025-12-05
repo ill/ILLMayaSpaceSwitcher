@@ -136,7 +136,7 @@ class SpacesUnionGroup:
             while orderedSpaceNamesIndex < len(spaceUnionSpaces) and spaceIndex < len(spaceGroup.spaces):
                 didFind = False
 
-                # look for the space name in orderedSpaceNamesIndex, if there, then we're good on this name
+                # look for the space name in spaceUnionSpaces, if there, then we're good on this named space, otherwise remove it from the union so far
                 while spaceIndex < len(spaceGroup.spaces):
                     if spaceUnionSpaces[orderedSpaceNamesIndex].name == spaceGroup.spaces[spaceIndex].name:
                         spaceUnionSpaces[orderedSpaceNamesIndex].spaces.append(spaceGroup.spaces[spaceIndex])
