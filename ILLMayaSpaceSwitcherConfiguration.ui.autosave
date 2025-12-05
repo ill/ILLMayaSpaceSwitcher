@@ -93,7 +93,7 @@
    <item>
     <layout class="QHBoxLayout" name="hl_selectedObject">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="lbl_selectedObjectName">
        <property name="text">
         <string>Selected Object Name</string>
        </property>
@@ -120,6 +120,46 @@
      </property>
      <property name="placeholderText">
       <string>Selected Object Name (Copy paste from here to the JSON)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="hl_selectedControlAttributes">
+     <item>
+      <widget class="QLabel" name="lbl_selectedControlAttributes">
+       <property name="text">
+        <string>Selected Control Attributes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_getSelectedControlAttributes">
+       <property name="text">
+        <string>Get Selected Control Attributes</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="te_selectedControlAttributes">
+     <property name="font">
+      <font>
+       <family>Lucida Console</family>
+       <kerning>false</kerning>
+      </font>
+     </property>
+     <property name="lineWrapMode">
+      <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
+     </property>
+     <property name="plainText">
+      <string/>
+     </property>
+     <property name="tabStopDistance">
+      <double>40.000000000000000</double>
+     </property>
+     <property name="placeholderText">
+      <string>Selected Control Attributes (Copy paste from here to the JSON)</string>
      </property>
     </widget>
    </item>

@@ -93,6 +93,13 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         # Selection Name Line Edit
         self.le_selectionName: QtWidgets.QLineEdit = self.widget.findChild(QtWidgets.QLineEdit, 'le_selectionName')
 
+        # Get Selected Control Attributes Button
+        self.btn_getSelectedControlAttributes: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_getSelectedControlAttributes')
+        self.btn_getSelectedControlAttributes.clicked.connect(self.getSelectedControlAttributesPressed)
+
+        # Selected Control Attributes Editor
+        self.te_selectedControlAttributes: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_selectedControlAttributes')
+
     def resizeEvent(self, event):
         """
         Called on automatically generated resize event
@@ -115,8 +122,11 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         self.te_jsonContents.setPlainText(
             '{\n'
             '\t"Group Name e.g (Spaces)":{\n'
-            '\t\t"Internal Attribute Name (Not Nice Name)":{\n'
+            '\t\t"Base Space Name (First space isn\'t an attribute name because there\'s no attribute)":{\n'
             '\t\t\t"transformName":"|LongName|COG_CTRL__space_world__LOC"\n'
+            '\t\t}\n'
+            '\t\t"Internal Attribute Name (Not Nice Name but script name)":{\n'
+            '\t\t\t"transformName":"|LongName|COG_CTRL__space_rig_main__LOC"\n'
             '\t\t}\n'
             '\t}\n'
             '}'
@@ -164,10 +174,20 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     def getSelectedObjectNamePressed(self):
         self.le_selectionName.setText(Util.getSelectedTransform())
 
+    def getSelectedControlAttributesPressed(self):
+        if self.selectedControl is None:
+            self.te_selectedControlAttributes.setPlainText(None)
+        else:
+            attrs = cmds.listAttr(self.selectedControl, keyable=True)
+            attrsString: str = ''
+
+            for attr in attrs:
+                attrsString += attr + '\n'
+
+            self.te_selectedControlAttributes.setPlainText(attrsString)
+
     def setSelectedControl(self, selectedControl):
         self.selectedControl = selectedControl
-
-        print(f'Setting selected control {self.selectedControl}')
 
         self.lbl_selectedControl.setText(f'Selected Control: {Util.getShortName(self.selectedControl)}')
 

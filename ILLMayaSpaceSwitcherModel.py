@@ -8,9 +8,9 @@ ILLMayaSpaceSwitcherConfigAttributeName: str = 'ILLMayaSpaceSwitcherConfig'
 # A definition of an individual space
 class Space:
     def __init__(self,
-                 name: str = '',
-                 attributeName: str = '',
-                 transformName: str = ''):
+                 name: str = None,
+                 attributeName: str = None,
+                 transformName: str = None):
         # Name of the space itself, usually the attribute nice name
         self.name: str = name
 
@@ -21,6 +21,14 @@ class Space:
         self.transformName: str = transformName
 
     @classmethod
+    def baseFromJsonData(cls, controlName: str, baseSpaceName: str, jsonData: {}):
+        if not Util.isLongName(controlName):
+            raise NameError(f'Use long names only for control name "{controlName}"')
+
+        return cls(name=baseSpaceName,
+                   transformName=cls.getTransformNameFromJsonData(jsonData=jsonData))
+
+    @classmethod
     def fromJsonData(cls, controlName: str, attributeName: str, jsonData: {}):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
@@ -28,6 +36,12 @@ class Space:
         if not cmds.attributeQuery(attributeName, node=controlName, exists=True):
             raise AttributeError(f'No attribute "{attributeName}" on control "{controlName}"')
 
+        return cls(name=cmds.attributeQuery(attributeName, node=controlName, niceName=True),
+                   attributeName=attributeName,
+                   transformName=cls.getTransformNameFromJsonData(jsonData=jsonData))
+
+    @staticmethod
+    def getTransformNameFromJsonData(jsonData: {}):
         transformName = jsonData['transformName']
 
         if not cmds.objExists(transformName):
@@ -39,16 +53,12 @@ class Space:
         if not Util.isLongName(transformName):
             raise NameError(f'Use long names only for transform "{transformName}"')
 
-        return cls(name=cmds.attributeQuery(attributeName, node=controlName, niceName=True),
-                   attributeName=attributeName,
-                   transformName=transformName)
-
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
 class SpaceGroup:
     def __init__(self,
-                 name: str = '',
-                 spaces: list[Space] = ()):
+                 name: str = None,
+                 spaces: list[Space] = None):
         # Name of the space group
         self.name: str = name
 
@@ -61,14 +71,16 @@ class SpaceGroup:
             raise NameError(f'Use long names only for control name "{controlName}"')
 
         return cls(name=name,
-                   spaces=[Space.fromJsonData(controlName=controlName, attributeName=attributeName, jsonData=spaceJsonData)
-                           for attributeName, spaceJsonData in jsonData.items()])
+                   spaces=[Space.baseFromJsonData(controlName=controlName, baseSpaceName=attributeOrBaseSpaceName, jsonData=spaceJsonData)
+                           if index == 0 else
+                           Space.fromJsonData(controlName=controlName, attributeName=attributeOrBaseSpaceName, jsonData=spaceJsonData)
+                           for index, (attributeOrBaseSpaceName, spaceJsonData) in enumerate(jsonData.items())])
 
 # Represents the definition of a single control's collection of spaces
 class Spaces:
     def __init__(self,
-                 controlName: str,
-                 spaceGroups: list[SpaceGroup] = ()):
+                 controlName: str = None,
+                 spaceGroups: list[SpaceGroup] = None):
         # The control name the spaces are on
         self.controlName: str = controlName
 
