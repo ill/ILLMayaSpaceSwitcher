@@ -34,16 +34,17 @@ class Space:
 
             name = cmds.attributeQuery(attributeName, node=controlName, niceName=True)
 
-        transformName = jsonData['transformName']
+        transformName = jsonData.get('transformName', None)
 
-        if not cmds.objExists(transformName):
-            raise NameError(f'No object "{transformName}" exists in the scene')
+        if transformName is not None:
+            if not cmds.objExists(transformName):
+                raise NameError(f'No object "{transformName}" exists in the scene')
 
-        if not cmds.nodeType(transformName) == 'transform':
-            raise TypeError(f'Object "{transformName}" is not a transform type')
+            if not cmds.nodeType(transformName) == 'transform':
+                raise TypeError(f'Object "{transformName}" is not a transform type')
 
-        if not Util.isLongName(transformName):
-            raise NameError(f'Use long names only for transform "{transformName}"')
+            if not Util.isLongName(transformName):
+                raise NameError(f'Use long names only for transform "{transformName}"')
 
         if attributeName is not None and not cmds.attributeQuery(attributeName, node=controlName, exists=True):
             raise AttributeError(f'No attribute "{attributeName}" on control "{controlName}"')
@@ -106,14 +107,56 @@ class Spaces:
                    spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
                    rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
 
-class SpacesUnionListEntry:
-    def __init__(self):
-        self.spaces: list[Space] = None
+class SpacesUnionSpace:
+    def __init__(self, name: str = '', spaces:list[Space] = None):
+        self.name = name
+        self.spaces = spaces
+
+class SpacesUnionGroup:
+    def __init__(self, name: str = ''):
+        self.name = name
+        self.spaces: list[SpacesUnionSpace] = None
+
+    def evaluateGroups(self, spaceGroups:list[SpaceGroup]):
+        self.spaces = None
+
+        if spaceGroups is None or len(spaceGroups) <= 0:
+            return
+
+        # First create an array from the very first selected group of space names
+        spaceUnionSpaces = [SpacesUnionSpace(space.name, [space]) for space in spaceGroups[0].spaces]
+
+        # Now go through every subsequent space and check to see if the names are in the same orders of the space names sets so far
+        for groupIndex in range(1, len(spaceGroups)):
+            spaceGroup = spaceGroups[groupIndex]
+
+            orderedSpaceNamesIndex = 0
+            spaceIndex = 0
+
+            while orderedSpaceNamesIndex < len(spaceUnionSpaces) and spaceIndex < len(spaceGroup.spaces):
+                didFind = False
+
+                # look for the space name in orderedSpaceNamesIndex, if there, then we're good on this name
+                while spaceIndex < len(spaceGroup.spaces):
+                    if spaceUnionSpaces[orderedSpaceNamesIndex].name == spaceGroup.spaces[spaceIndex].name:
+                        spaceUnionSpaces[orderedSpaceNamesIndex].spaces.append(spaceGroup.spaces[spaceIndex])
+                        orderedSpaceNamesIndex += 1
+                        spaceIndex += 1
+                        didFind = True
+                        break
+                    else:
+                        spaceIndex += 1
+
+                if not didFind:
+                    del spaceUnionSpaces[orderedSpaceNamesIndex]
 
 # When working with multiple selected controls, this tracks the union of what the selected spaces are among the objects as long as their space names match and are in the same order
 class SpacesUnion:
     def __init__(self):
         self.spaces: set[Spaces] = set()
+
+        self.spacesUnionGroup: SpacesUnionGroup = None
+        self.rotationSpacesUnionGroup: SpacesUnionGroup = None
 
     def addSpaces(self, spaces:Spaces) -> bool:
         spacesNum = len(self.spaces)
@@ -134,4 +177,25 @@ class SpacesUnion:
         return True
 
     def evaluateSpaces(self):
-        pass
+        # Check if all spaces have spaces and rot spaces
+        allSpacesHaveSpaces = True
+        allSpacesHaveRotationSpaces = True
+
+        for space in self.spaces:
+            if space.spaces is None:
+                allSpacesHaveSpaces = False
+
+            if space.rotationSpaces is None:
+                allSpacesHaveRotationSpaces = False
+
+        if allSpacesHaveSpaces:
+            self.spacesUnionGroup = SpacesUnionGroup("Spaces")
+            self.spacesUnionGroup.evaluateGroups([space.spaces for space in self.spaces])
+        else:
+            self.spacesUnionGroup = None
+
+        if allSpacesHaveRotationSpaces:
+            self.rotationSpacesUnionGroup = SpacesUnionGroup("Rotation Spaces")
+            self.rotationSpacesUnionGroup.evaluateGroups([space.rotationSpaces for space in self.spaces])
+        else:
+            self.rotationSpacesUnionGroup = None
