@@ -21,27 +21,19 @@ class Space:
         self.transformName: str = transformName
 
     @classmethod
-    def baseFromJsonData(cls, controlName: str, baseSpaceName: str, jsonData: {}):
+    def fromJsonData(cls, controlName: str, jsonData: {}):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
-        return cls(name=baseSpaceName,
-                   transformName=cls.getTransformNameFromJsonData(jsonData=jsonData))
+        name = jsonData.get('name', None)
+        attributeName = jsonData.get('attributeName', None)
 
-    @classmethod
-    def fromJsonData(cls, controlName: str, attributeName: str, jsonData: {}):
-        if not Util.isLongName(controlName):
-            raise NameError(f'Use long names only for control name "{controlName}"')
+        if name is None:
+            if attributeName is None:
+                raise NameError(f'attributeName and name are both unspecified for space definition')
 
-        if not cmds.attributeQuery(attributeName, node=controlName, exists=True):
-            raise AttributeError(f'No attribute "{attributeName}" on control "{controlName}"')
+            name = cmds.attributeQuery(attributeName, node=controlName, niceName=True)
 
-        return cls(name=cmds.attributeQuery(attributeName, node=controlName, niceName=True),
-                   attributeName=attributeName,
-                   transformName=cls.getTransformNameFromJsonData(jsonData=jsonData))
-
-    @staticmethod
-    def getTransformNameFromJsonData(jsonData: {}):
         transformName = jsonData['transformName']
 
         if not cmds.objExists(transformName):
@@ -52,6 +44,13 @@ class Space:
 
         if not Util.isLongName(transformName):
             raise NameError(f'Use long names only for transform "{transformName}"')
+
+        if attributeName is not None and not cmds.attributeQuery(attributeName, node=controlName, exists=True):
+            raise AttributeError(f'No attribute "{attributeName}" on control "{controlName}"')
+
+        return cls(name=name,
+                   attributeName=attributeName,
+                   transformName=transformName)
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
@@ -70,13 +69,11 @@ class SpaceGroup:
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
-        # We expect a bool field named hasBaseSpace to determine if the first space is a base space
+        definitionsJsonData = jsonData.get('Definitions', None)
 
         return cls(name=name,
-                   spaces=[Space.baseFromJsonData(controlName=controlName, baseSpaceName=attributeOrBaseSpaceName, jsonData=spaceJsonData)
-                           if index == 0 else
-                           Space.fromJsonData(controlName=controlName, attributeName=attributeOrBaseSpaceName, jsonData=spaceJsonData)
-                           for index, (attributeOrBaseSpaceName, spaceJsonData) in enumerate(jsonData.items())])
+                   spaces=[Space.fromJsonData(controlName=controlName, jsonData=spaceDefinitionJsonData)
+                           for spaceDefinitionJsonData in definitionsJsonData] if definitionsJsonData is not None else None)
 
 # Represents the definition of a single control's collection of spaces
 class Spaces:
@@ -102,12 +99,12 @@ class Spaces:
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
-        spacesJsonData = jsonData.get("Spaces", None)
-        rotationSpacesJsonData = jsonData.get("Rotation Spaces", None)
+        spacesJsonData = jsonData.get('Spaces', None)
+        rotationSpacesJsonData = jsonData.get('Rotation Spaces', None)
 
         return cls(controlName=controlName,
-                   spaces=SpaceGroup.fromJsonData(controlName=controlName, name="Spaces", jsonData=spacesJsonData) if spacesJsonData is not None else None,
-                   rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name="Rotation Spaces", jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
+                   spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
+                   rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
 
 class SpacesUnionListEntry:
     def __init__(self):
