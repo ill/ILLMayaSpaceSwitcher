@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 
 def getSelectedTransforms():
-    return cmds.ls(sl=True, dag=True, type='transform', long=True)
+    return cmds.ls(sl=True, type='transform', long=True)
 
 def getSelectedTransform():
     selectedTransforms = getSelectedTransforms()
