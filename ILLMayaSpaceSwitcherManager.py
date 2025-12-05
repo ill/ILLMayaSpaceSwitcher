@@ -48,7 +48,24 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\ILLMayaSpaceSwitcherManager.ui')
         self.widget.setParent(self)
 
-        # set initial window sizes
+        # Refresh Button
+        self.btn_refresh: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_refresh')
+        self.btn_refresh.clicked.connect(self.refreshPressed)
+
+        # Selected Control Label
+        self.lbl_selectedControlsList: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_selectedControlsList')
+
+        # Key Enabled Check Box
+        self.cb_keyEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_keyEnabled')
+
+        # Auto Refresh Enabled Check Box
+        self.cb_autoRefreshEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_autoRefreshEnabled')
+
+        # Spaces List Contents
+        self.sa_spacesListContents: QtWidgets.QWidget = self.widget.findChild(QtWidgets.QWidget, 'sa_spacesListContents')
+
+
+        # set initial window geometry
         restoredGeometry = ILLMayaSpaceSwitcherManager.SETTINGS.value(ILLMayaSpaceSwitcherManager.GEOMETRY_SETTING, None)
 
         if restoredGeometry is None:
