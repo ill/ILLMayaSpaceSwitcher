@@ -14,6 +14,7 @@ from functools import partial  # optional, for passing args during signal functi
 import sys
 import pathlib
 
+import Util
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherManager")
@@ -43,6 +44,9 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         Initialize class.
         """
         super(ILLMayaSpaceSwitcherManager, self).__init__(parent=parent)
+
+        self.selectedControls: list[str] = None
+
         self.setWindowFlags(QtCore.Qt.Window)
         self.widgetPath = str(pathlib.Path(__file__).parent.resolve())
         self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\ILLMayaSpaceSwitcherManager.ui')
@@ -91,3 +95,16 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
         self.destroy()
 
+    def refreshPressed(self):
+        self.setSelectedControls(selectedControls=Util.getSelectedTransforms())
+
+    def setSelectedControls(self, selectedControls:list[str]):
+        self.selectedControls = selectedControls
+
+        print(self.selectedControls)
+
+        if self.selectedControls is None or len(self.selectedControls) <= 0:
+            self.lbl_selectedControlsList.setText('None')
+            return
+
+        self.lbl_selectedControlsList.setText(', '.join([Util.getShortName(selectedControl) for selectedControl in self.selectedControls]))

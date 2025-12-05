@@ -62,7 +62,7 @@
        <item>
         <widget class="QLabel" name="lbl_selectedControlsList">
          <property name="text">
-          <string>TextLabel</string>
+          <string>None</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
