@@ -124,7 +124,7 @@ class SpacesUnionGroup:
             return
 
         # First create an array from the very first selected group of space names
-        spaceUnionSpaces = [SpacesUnionSpace(space.name, [space]) for space in spaceGroups[0].spaces]
+        self.spaces = [SpacesUnionSpace(space.name, [space]) for space in spaceGroups[0].spaces]
 
         # Now go through every subsequent space and check to see if the names are in the same orders of the space names sets so far
         for groupIndex in range(1, len(spaceGroups)):
@@ -133,13 +133,13 @@ class SpacesUnionGroup:
             orderedSpaceNamesIndex = 0
             spaceIndex = 0
 
-            while orderedSpaceNamesIndex < len(spaceUnionSpaces) and spaceIndex < len(spaceGroup.spaces):
+            while orderedSpaceNamesIndex < len(self.spaces) and spaceIndex < len(spaceGroup.spaces):
                 didFind = False
 
                 # look for the space name in spaceUnionSpaces, if there, then we're good on this named space, otherwise remove it from the union so far
                 while spaceIndex < len(spaceGroup.spaces):
-                    if spaceUnionSpaces[orderedSpaceNamesIndex].name == spaceGroup.spaces[spaceIndex].name:
-                        spaceUnionSpaces[orderedSpaceNamesIndex].spaces.append(spaceGroup.spaces[spaceIndex])
+                    if self.spaces[orderedSpaceNamesIndex].name == spaceGroup.spaces[spaceIndex].name:
+                        self.spaces[orderedSpaceNamesIndex].spaces.append(spaceGroup.spaces[spaceIndex])
                         orderedSpaceNamesIndex += 1
                         spaceIndex += 1
                         didFind = True
@@ -148,7 +148,7 @@ class SpacesUnionGroup:
                         spaceIndex += 1
 
                 if not didFind:
-                    del spaceUnionSpaces[orderedSpaceNamesIndex]
+                    del self.spaces[orderedSpaceNamesIndex]
 
 # When working with multiple selected controls, this tracks the union of what the selected spaces are among the objects as long as their space names match and are in the same order
 class SpacesUnion:
