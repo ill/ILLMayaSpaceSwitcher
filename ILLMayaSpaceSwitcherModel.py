@@ -149,7 +149,7 @@ class SpacesUnionGroup:
             orderedSpaceNamesIndex = 0
             spaceIndex = 0
 
-            while orderedSpaceNamesIndex < len(self.spaces) and spaceIndex < len(spaceGroup.spaces):
+            while orderedSpaceNamesIndex < len(self.spaces):
                 didFind = False
 
                 # look for the space name in spaceUnionSpaces, if there, then we're good on this named space, otherwise remove it from the union so far
