@@ -64,7 +64,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         super(ILLMayaSpaceSwitcherManager, self).__init__(parent=parent)
 
         self.selectedControls: list[str] = None
-        self.spacesUnion: ILLMayaSpaceSwitcherModel.SpacesUnion() = None
+        self.spacesIntersection: ILLMayaSpaceSwitcherModel.SpacesIntersection() = None
         self.spaceWidgetWrappers: list[IllMayaSpaceWidgetWrapper] = None
 
         self.setWindowFlags(QtCore.Qt.Window)
@@ -133,26 +133,26 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
         self.lbl_selectedControlsList.setText(', '.join([Util.getShortName(selectedControl) for selectedControl in self.selectedControls]))
 
-        # go through each control and build the union of spaces
-        self.spacesUnion = ILLMayaSpaceSwitcherModel.SpacesUnion()
+        # go through each control and build the intersection of spaces
+        self.spacesIntersection = ILLMayaSpaceSwitcherModel.SpacesIntersection()
         for spaces in [ILLMayaSpaceSwitcherModel.Spaces.fromControl(selectedControl) for selectedControl in self.selectedControls]:
             if spaces is not None:
-                self.spacesUnion.addSpaces(spaces)
+                self.spacesIntersection.addSpaces(spaces)
 
-        self.spacesUnion.evaluateSpaces()
+        self.spacesIntersection.evaluateSpaces()
 
         self.spaceWidgetWrappers = []
 
-        self.setupSpacesUI(spacesUnionGroup=self.spacesUnion.spacesUnionGroup, groupName="Spaces")
-        self.setupSpacesUI(spacesUnionGroup=self.spacesUnion.rotationSpacesUnionGroup, groupName="Rotation Spaces")
+        self.setupSpacesUI(spacesIntersectionGroup=self.spacesIntersection.spacesIntersectionGroup, groupName="Spaces")
+        self.setupSpacesUI(spacesIntersectionGroup=self.spacesIntersection.rotationSpacesIntersectionGroup, groupName="Rotation Spaces")
 
-    def setupSpacesUI(self, spacesUnionGroup: ILLMayaSpaceSwitcherModel.SpacesUnionGroup, groupName: str):
+    def setupSpacesUI(self, spacesIntersectionGroup: ILLMayaSpaceSwitcherModel.SpacesIntersectionGroup, groupName: str):
         # update the spaces UI
-        if spacesUnionGroup is not None:
-            if spacesUnionGroup.spaces is not None and len(spacesUnionGroup.spaces) > 0:
+        if spacesIntersectionGroup is not None:
+            if spacesIntersectionGroup.spaces is not None and len(spacesIntersectionGroup.spaces) > 0:
                 self.sa_spacesListContents.layout().addWidget(createGroupNameWidget(groupName))
 
-                for space in spacesUnionGroup.spaces:
+                for space in spacesIntersectionGroup.spaces:
                     spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
                     self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
                     self.spaceWidgetWrappers.append(spaceWidgetWrapper)

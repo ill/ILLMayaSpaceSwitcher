@@ -124,15 +124,15 @@ class Spaces:
                    spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
                    rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
 
-class SpacesUnionSpace:
+class SpacesIntersectionSpace:
     def __init__(self, name: str = '', spaces:list[Space] = None):
         self.name = name
         self.spaces = spaces
 
-class SpacesUnionGroup:
+class SpacesIntersectionGroup:
     def __init__(self, name: str = ''):
         self.name = name
-        self.spaces: list[SpacesUnionSpace] = None
+        self.spaces: list[SpacesIntersectionSpace] = None
 
     def evaluateGroups(self, spaceGroups:list[SpaceGroup]):
         self.spaces = None
@@ -141,7 +141,7 @@ class SpacesUnionGroup:
             return
 
         # First create an array from the very first selected group of space names
-        self.spaces = [SpacesUnionSpace(space.name, [space]) for space in spaceGroups[0].spaces]
+        self.spaces = [SpacesIntersectionSpace(space.name, [space]) for space in spaceGroups[0].spaces]
 
         # Now go through every subsequent space and check to see if the names are in the same orders of the space names sets so far
         for groupIndex in range(1, len(spaceGroups)):
@@ -158,7 +158,7 @@ class SpacesUnionGroup:
 
                 didFind = False
 
-                # look for the space name in spaceUnionSpaces, if there, then we're good on this named space, otherwise remove it from the union so far
+                # look for the space name in spaceIntersectionSpaces, if there, then we're good on this named space, otherwise remove it from the intersection so far
                 while spaceIndex < len(spaceGroup.spaces):
                     if self.spaces[orderedSpaceNamesIndex].name == spaceGroup.spaces[spaceIndex].name:
                         self.spaces[orderedSpaceNamesIndex].spaces.append(spaceGroup.spaces[spaceIndex])
@@ -172,13 +172,13 @@ class SpacesUnionGroup:
                 if not didFind:
                     del self.spaces[orderedSpaceNamesIndex]
 
-# When working with multiple selected controls, this tracks the union of what the selected spaces are among the objects as long as their space names match and are in the same order
-class SpacesUnion:
+# When working with multiple selected controls, this tracks the intersection of the set of what the selected spaces are among the objects as long as their space names match and are in the same order
+class SpacesIntersection:
     def __init__(self):
         self.spaces: set[Spaces] = set()
 
-        self.spacesUnionGroup: SpacesUnionGroup = None
-        self.rotationSpacesUnionGroup: SpacesUnionGroup = None
+        self.spacesIntersectionGroup: SpacesIntersectionGroup = None
+        self.rotationSpacesIntersectionGroup: SpacesIntersectionGroup = None
 
     def addSpaces(self, spaces:Spaces) -> bool:
         spacesNum = len(self.spaces)
@@ -211,13 +211,13 @@ class SpacesUnion:
                 allSpacesHaveRotationSpaces = False
 
         if allSpacesHaveSpaces:
-            self.spacesUnionGroup = SpacesUnionGroup("Spaces")
-            self.spacesUnionGroup.evaluateGroups([space.spaces for space in self.spaces])
+            self.spacesIntersectionGroup = SpacesIntersectionGroup("Spaces")
+            self.spacesIntersectionGroup.evaluateGroups([space.spaces for space in self.spaces])
         else:
-            self.spacesUnionGroup = None
+            self.spacesIntersectionGroup = None
 
         if allSpacesHaveRotationSpaces:
-            self.rotationSpacesUnionGroup = SpacesUnionGroup("Rotation Spaces")
-            self.rotationSpacesUnionGroup.evaluateGroups([space.rotationSpaces for space in self.spaces])
+            self.rotationSpacesIntersectionGroup = SpacesIntersectionGroup("Rotation Spaces")
+            self.rotationSpacesIntersectionGroup.evaluateGroups([space.rotationSpaces for space in self.spaces])
         else:
-            self.rotationSpacesUnionGroup = None
+            self.rotationSpacesIntersectionGroup = None
