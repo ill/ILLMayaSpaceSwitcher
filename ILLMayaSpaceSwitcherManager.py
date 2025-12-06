@@ -151,7 +151,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
             if spacesUnionGroup.spaces is not None and len(spacesUnionGroup.spaces) > 0:
                 self.sa_spacesListContents.layout().addWidget(createGroupNameWidget(groupName))
 
-                for space in self.spacesUnion.spacesUnionGroup.spaces:
+                for space in spacesUnionGroup.spaces:
                     spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
                     self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
                     self.spaceWidgetWrappers.append(spaceWidgetWrapper)

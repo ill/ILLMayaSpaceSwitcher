@@ -150,6 +150,11 @@ class SpacesUnionGroup:
             spaceIndex = 0
 
             while orderedSpaceNamesIndex < len(self.spaces):
+                # if we reached the end of the other space group then erase the rest of the list
+                if spaceIndex >= len(spaceGroup.spaces):
+                    del self.spaces[orderedSpaceNamesIndex:]
+                    break
+
                 didFind = False
 
                 # look for the space name in spaceUnionSpaces, if there, then we're good on this named space, otherwise remove it from the union so far
