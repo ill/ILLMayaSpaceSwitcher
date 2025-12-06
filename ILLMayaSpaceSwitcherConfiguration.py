@@ -221,7 +221,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             self.te_selectedControlAttributes.setPlainText(attrsString)
 
     def setSelectedControl(self, selectedControl:str):
-        if selectedControl == selectedControl:
+        if self.selectedControl == selectedControl:
             return
 
         self.selectedControl = selectedControl
