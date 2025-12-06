@@ -136,7 +136,8 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         # go through each control and build the union of spaces
         self.spacesUnion = ILLMayaSpaceSwitcherModel.SpacesUnion()
         for spaces in [ILLMayaSpaceSwitcherModel.Spaces.fromControl(selectedControl) for selectedControl in self.selectedControls]:
-            self.spacesUnion.addSpaces(spaces)
+            if spaces is not None:
+                self.spacesUnion.addSpaces(spaces)
 
         self.spacesUnion.evaluateSpaces()
 

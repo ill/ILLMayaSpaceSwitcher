@@ -105,11 +105,12 @@ class Spaces:
 
     @classmethod
     def fromControl(cls, controlName: str):
-        return cls.fromJsonStr(controlName=controlName, jsonStr=cls.getJsonStrFromControl(controlName=controlName))
+        jsonStr = cls.getJsonStrFromControl(controlName=controlName)
+        return cls.fromJsonStr(controlName=controlName, jsonStr=jsonStr) if jsonStr is not None else None
 
     @classmethod
     def fromJsonStr(cls, controlName: str, jsonStr: str):
-        return cls.fromJsonData(controlName=controlName, jsonData = json.loads(jsonStr))
+        return cls.fromJsonData(controlName=controlName, jsonData = json.loads(jsonStr)) if jsonStr is not None else None
 
     @classmethod
     def fromJsonData(cls, controlName: str, jsonData: {}):
