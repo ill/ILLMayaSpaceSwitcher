@@ -50,8 +50,8 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         self.selectedControl: str = None
 
         self.setWindowFlags(QtCore.Qt.Window)
-        self.widgetPath = str(pathlib.Path(__file__).parent.resolve())
-        self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\ILLMayaSpaceSwitcherConfiguration.ui')
+        widgetPath = str(pathlib.Path(__file__).parent.resolve())
+        self.widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceSwitcherConfiguration.ui')
         self.widget.setParent(self)
 
         # Selected Control Label
@@ -221,6 +221,9 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             self.te_selectedControlAttributes.setPlainText(attrsString)
 
     def setSelectedControl(self, selectedControl:str):
+        if selectedControl == selectedControl:
+            return
+
         self.selectedControl = selectedControl
 
         self.lbl_selectedControl.setText(f'Selected Control: {Util.getShortName(self.selectedControl)}')

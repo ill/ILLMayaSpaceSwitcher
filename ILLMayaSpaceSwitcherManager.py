@@ -17,6 +17,16 @@ import pathlib
 import Util
 import ILLMayaSpaceSwitcherModel
 
+
+def createGroupNameWidget(groupName: str = None):
+    widgetPath = str(pathlib.Path(__file__).parent.resolve())
+    widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceGroupNameWidget.ui')
+
+    lbl_spaceGroupName: QtWidgets.QLabel = widget.findChild(QtWidgets.QLabel, 'lbl_spaceGroupName')
+    lbl_spaceGroupName.setText(groupName)
+
+    return widget
+
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherManager")
     GEOMETRY_SETTING = "geometry"
@@ -50,8 +60,8 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         self.spacesUnion: ILLMayaSpaceSwitcherModel.SpacesUnion() = None
 
         self.setWindowFlags(QtCore.Qt.Window)
-        self.widgetPath = str(pathlib.Path(__file__).parent.resolve())
-        self.widget = QtUiTools.QUiLoader().load(self.widgetPath + '\\ILLMayaSpaceSwitcherManager.ui')
+        widgetPath = str(pathlib.Path(__file__).parent.resolve())
+        self.widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceSwitcherManager.ui')
         self.widget.setParent(self)
 
         # Refresh Button
@@ -101,9 +111,12 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         self.setSelectedControls(selectedControls=Util.getSelectedTransforms())
 
     def setSelectedControls(self, selectedControls:list[str]):
+        if self.selectedControls == selectedControls:
+            return
+
         self.selectedControls = selectedControls
 
-        print(self.selectedControls)
+        Util.clearWidget(self.sa_spacesListContents)
 
         if self.selectedControls is None or len(self.selectedControls) <= 0:
             self.lbl_selectedControlsList.setText('None')
@@ -119,3 +132,8 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         spacesUnion.evaluateSpaces()
 
         # update the spaces UI
+        if spacesUnion.spacesUnionGroup is not None:
+            self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Spaces"))
+
+        if spacesUnion.rotationSpacesUnionGroup is not None:
+            self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Rotation Spaces"))
