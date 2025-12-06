@@ -204,6 +204,10 @@ class SpacesIntersection:
         allSpacesHaveRotationSpaces = True
 
         for space in self.spaces:
+            # If we encounter a None space, we definitely have no intersection of anything
+            if space is None:
+                return
+
             if space.spaces is None:
                 allSpacesHaveSpaces = False
 

@@ -136,8 +136,11 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         # go through each control and build the intersection of spaces
         self.spacesIntersection = ILLMayaSpaceSwitcherModel.SpacesIntersection()
         for spaces in [ILLMayaSpaceSwitcherModel.Spaces.fromControl(selectedControl) for selectedControl in self.selectedControls]:
-            if spaces is not None:
-                self.spacesIntersection.addSpaces(spaces)
+            # early out optimization, where if we run into a space that's None, we know there is no intersection of spaces on any selections
+            if spaces is None:
+                return
+
+            self.spacesIntersection.addSpaces(spaces)
 
         self.spacesIntersection.evaluateSpaces()
 
