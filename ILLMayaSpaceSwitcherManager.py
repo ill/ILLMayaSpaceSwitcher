@@ -142,21 +142,16 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
         self.spaceWidgetWrappers = []
 
+        self.setupSpacesUI(spacesUnionGroup=self.spacesUnion.spacesUnionGroup, groupName="Spaces")
+        self.setupSpacesUI(spacesUnionGroup=self.spacesUnion.rotationSpacesUnionGroup, groupName="Rotation Spaces")
+
+    def setupSpacesUI(self, spacesUnionGroup: ILLMayaSpaceSwitcherModel.SpacesUnionGroup, groupName: str):
         # update the spaces UI
-        if self.spacesUnion.spacesUnionGroup is not None:
-            if self.spacesUnion.spacesUnionGroup.spaces is not None and len(self.spacesUnion.spacesUnionGroup.spaces) > 0:
-                self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Spaces"))
+        if spacesUnionGroup is not None:
+            if spacesUnionGroup.spaces is not None and len(spacesUnionGroup.spaces) > 0:
+                self.sa_spacesListContents.layout().addWidget(createGroupNameWidget(groupName))
 
                 for space in self.spacesUnion.spacesUnionGroup.spaces:
-                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
-                    self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
-                    self.spaceWidgetWrappers.append(spaceWidgetWrapper)
-
-        if self.spacesUnion.rotationSpacesUnionGroup is not None:
-            if self.spacesUnion.rotationSpacesUnionGroup.spaces is not None and len(self.spacesUnion.rotationSpacesUnionGroup.spaces) > 0:
-                self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Rotation Spaces"))
-
-                for space in self.spacesUnion.rotationSpacesUnionGroup.spaces:
                     spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
                     self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
                     self.spaceWidgetWrappers.append(spaceWidgetWrapper)
