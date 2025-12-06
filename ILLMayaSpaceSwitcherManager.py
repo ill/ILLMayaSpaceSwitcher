@@ -17,7 +17,6 @@ import pathlib
 import Util
 import ILLMayaSpaceSwitcherModel
 
-
 def createGroupNameWidget(groupName: str = None):
     widgetPath = str(pathlib.Path(__file__).parent.resolve())
     widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceGroupNameWidget.ui')
@@ -26,6 +25,14 @@ def createGroupNameWidget(groupName: str = None):
     lbl_spaceGroupName.setText(groupName)
 
     return widget
+
+class IllMayaSpaceWidgetWrapper:
+    def __init__(self, spaceName: str = None):
+        widgetPath = str(pathlib.Path(__file__).parent.resolve())
+        self.widget = QtUiTools.QUiLoader().load(widgetPath + '\\IllMayaSpaceWidget.ui')
+
+        lbl_spaceName: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_spaceName')
+        lbl_spaceName.setText(spaceName)
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherManager")
@@ -58,6 +65,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
         self.selectedControls: list[str] = None
         self.spacesUnion: ILLMayaSpaceSwitcherModel.SpacesUnion() = None
+        self.spaceWidgetWrappers: list[IllMayaSpaceWidgetWrapper] = None
 
         self.setWindowFlags(QtCore.Qt.Window)
         widgetPath = str(pathlib.Path(__file__).parent.resolve())
@@ -117,6 +125,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         self.selectedControls = selectedControls
 
         Util.clearWidget(self.sa_spacesListContents)
+        self.spaceWidgetWrappers = None
 
         if self.selectedControls is None or len(self.selectedControls) <= 0:
             self.lbl_selectedControlsList.setText('None')
@@ -125,15 +134,29 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         self.lbl_selectedControlsList.setText(', '.join([Util.getShortName(selectedControl) for selectedControl in self.selectedControls]))
 
         # go through each control and build the union of spaces
-        spacesUnion = ILLMayaSpaceSwitcherModel.SpacesUnion()
+        self.spacesUnion = ILLMayaSpaceSwitcherModel.SpacesUnion()
         for spaces in [ILLMayaSpaceSwitcherModel.Spaces.fromControl(selectedControl) for selectedControl in self.selectedControls]:
-            spacesUnion.addSpaces(spaces)
+            self.spacesUnion.addSpaces(spaces)
 
-        spacesUnion.evaluateSpaces()
+        self.spacesUnion.evaluateSpaces()
+
+        self.spaceWidgetWrappers = []
 
         # update the spaces UI
-        if spacesUnion.spacesUnionGroup is not None:
-            self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Spaces"))
+        if self.spacesUnion.spacesUnionGroup is not None:
+            if self.spacesUnion.spacesUnionGroup.spaces is not None and len(self.spacesUnion.spacesUnionGroup.spaces) > 0:
+                self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Spaces"))
 
-        if spacesUnion.rotationSpacesUnionGroup is not None:
-            self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Rotation Spaces"))
+                for space in self.spacesUnion.spacesUnionGroup.spaces:
+                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
+                    self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
+                    self.spaceWidgetWrappers.append(spaceWidgetWrapper)
+
+        if self.spacesUnion.rotationSpacesUnionGroup is not None:
+            if self.spacesUnion.rotationSpacesUnionGroup.spaces is not None and len(self.spacesUnion.rotationSpacesUnionGroup.spaces) > 0:
+                self.sa_spacesListContents.layout().addWidget(createGroupNameWidget("Rotation Spaces"))
+
+                for space in self.spacesUnion.rotationSpacesUnionGroup.spaces:
+                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
+                    self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
+                    self.spaceWidgetWrappers.append(spaceWidgetWrapper)
