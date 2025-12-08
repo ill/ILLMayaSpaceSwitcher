@@ -13,10 +13,9 @@ import pathlib
 
 import Util
 import ILLMayaSpaceSwitcherModel
-#import resources_rc
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
-    SETTINGS = QtCore.QSettings("", "ILLMayaSpaceSwitcherConfiguration")
+    SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherConfiguration")
     GEOMETRY_SETTING = "geometry"
     SPLITTER_SETTING = "splitter"
 

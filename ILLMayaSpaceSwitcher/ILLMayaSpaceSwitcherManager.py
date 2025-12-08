@@ -12,7 +12,6 @@ import pathlib
 
 import Util
 import ILLMayaSpaceSwitcherModel
-#import resources_rc
 
 def createGroupNameWidget(groupName: str = None):
     widgetPath = str(pathlib.Path(__file__).parent.resolve())
@@ -32,7 +31,7 @@ class IllMayaSpaceWidgetWrapper:
         lbl_spaceName.setText(spaceName)
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
-    SETTINGS = QtCore.QSettings("", "ILLMayaSpaceSwitcherManager")
+    SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")
     GEOMETRY_SETTING = "geometry"
 
     @staticmethod
