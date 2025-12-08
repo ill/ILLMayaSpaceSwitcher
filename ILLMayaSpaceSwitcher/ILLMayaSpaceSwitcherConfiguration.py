@@ -13,6 +13,7 @@ import pathlib
 
 import Util
 import ILLMayaSpaceSwitcherModel
+#import resources_rc
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("", "ILLMayaSpaceSwitcherConfiguration")

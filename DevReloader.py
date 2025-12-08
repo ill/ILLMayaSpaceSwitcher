@@ -1,8 +1,14 @@
-from ILLMayaSpaceSwitcher import ILLMayaSpaceSwitcherManager, Util, ILLMayaSpaceSwitcherModel, ILLMayaSpaceSwitcherConfiguration
+#import ILLMayaSpaceSwitcher.resources_rc
+import ILLMayaSpaceSwitcher.Util
+import ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherModel
+import ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration
+import ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherManager
 
 # For Development
 from importlib import reload
-reload(Util)
-reload(ILLMayaSpaceSwitcherModel)
-reload(ILLMayaSpaceSwitcherConfiguration)
-reload(ILLMayaSpaceSwitcherManager)
+#reload(ILLMayaSpaceSwitcher.resources_rc)
+reload(ILLMayaSpaceSwitcher.Util)
+reload(ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherModel)
+reload(ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration)
+reload(ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherManager)
+

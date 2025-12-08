@@ -1,9 +1,9 @@
-from ILLMayaSpaceSwitcher import ILLMayaSpaceSwitcherConfiguration
+import ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration
 
 # For Development
 import DevReloader
 from importlib import reload
 reload(DevReloader)
 
-# ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.wipeSettings()
-ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.openMayaMainToolWindowInstance()
+# ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.wipeSettings()
+ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.openMayaMainToolWindowInstance()

@@ -24,7 +24,7 @@
    <item>
     <spacer name="horizontalSpacer">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -43,8 +43,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>IconWIP.png</normaloff>IconWIP.png</iconset>
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/IconWIP.png</normaloff>:/icons/IconWIP.png</iconset>
      </property>
     </widget>
    </item>
@@ -63,8 +63,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>IconWIP.png</normaloff>IconWIP.png</iconset>
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/IconWIP.png</normaloff>:/icons/IconWIP.png</iconset>
      </property>
     </widget>
    </item>
@@ -77,8 +77,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>IconWIP.png</normaloff>IconWIP.png</iconset>
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/IconWIP.png</normaloff>:/icons/IconWIP.png</iconset>
      </property>
     </widget>
    </item>
@@ -91,8 +91,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>IconWIP.png</normaloff>IconWIP.png</iconset>
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/IconWIP.png</normaloff>:/icons/IconWIP.png</iconset>
      </property>
     </widget>
    </item>
@@ -105,8 +105,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>IconWIP.png</normaloff>IconWIP.png</iconset>
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/IconWIP.png</normaloff>:/icons/IconWIP.png</iconset>
      </property>
     </widget>
    </item>
@@ -119,13 +119,15 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>IconWIP.png</normaloff>IconWIP.png</iconset>
+      <iconset resource="../resources.qrc">
+       <normaloff>:/icons/IconWIP.png</normaloff>:/icons/IconWIP.png</iconset>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

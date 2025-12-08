@@ -1,0 +1,1 @@
+"C:\Program Files\Autodesk\Maya2025\bin\rcc.exe" -g python resources.qrc -o ILLMayaSpaceSwitcher\resources_rc.py

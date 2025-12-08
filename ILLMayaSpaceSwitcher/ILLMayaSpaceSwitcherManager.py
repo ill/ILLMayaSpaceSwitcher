@@ -12,6 +12,7 @@ import pathlib
 
 import Util
 import ILLMayaSpaceSwitcherModel
+#import resources_rc
 
 def createGroupNameWidget(groupName: str = None):
     widgetPath = str(pathlib.Path(__file__).parent.resolve())
