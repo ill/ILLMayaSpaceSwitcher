@@ -2,16 +2,12 @@
 # import ILLMayaSpaceSwitcherManager
 # ILLMayaSpaceSwitcherManager.ILLMayaSpaceSwitcherManager.openMayaMainToolWindowInstance()
 
-import maya.cmds as cmds
-import maya.mel as mel
 from maya import OpenMayaUI as omui
 # TODO: Figure out maya < 2025 and >= 2025 support
 # from shiboken2 import wrapInstance
 # from PySide2 import QtUiTools, QtCore, QtGui, QtWidgets
 from shiboken6 import wrapInstance
-from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
-from functools import partial  # optional, for passing args during signal function calls
-import sys
+from PySide6 import QtUiTools, QtCore, QtWidgets
 import pathlib
 
 import Util
@@ -35,7 +31,7 @@ class IllMayaSpaceWidgetWrapper:
         lbl_spaceName.setText(spaceName)
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
-    SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherManager")
+    SETTINGS = QtCore.QSettings("", "ILLMayaSpaceSwitcherManager")
     GEOMETRY_SETTING = "geometry"
 
     @staticmethod

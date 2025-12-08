@@ -1,7 +1,4 @@
-import Util
-import ILLMayaSpaceSwitcherModel
-import ILLMayaSpaceSwitcherConfiguration
-import ILLMayaSpaceSwitcherManager
+from ILLMayaSpaceSwitcher import ILLMayaSpaceSwitcherManager, Util, ILLMayaSpaceSwitcherModel, ILLMayaSpaceSwitcherConfiguration
 
 # For Development
 from importlib import reload

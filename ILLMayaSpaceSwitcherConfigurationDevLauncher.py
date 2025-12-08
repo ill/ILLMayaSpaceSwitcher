@@ -1,4 +1,4 @@
-import ILLMayaSpaceSwitcherConfiguration
+from ILLMayaSpaceSwitcher import ILLMayaSpaceSwitcherConfiguration
 
 # For Development
 import DevReloader

@@ -8,17 +8,14 @@ from maya import OpenMayaUI as omui
 # from shiboken2 import wrapInstance
 # from PySide2 import QtUiTools, QtCore, QtGui, QtWidgets
 from shiboken6 import wrapInstance
-from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
-from functools import partial  # optional, for passing args during signal function calls
-import sys
+from PySide6 import QtUiTools, QtCore, QtWidgets
 import pathlib
-from typing import Optional
 
 import Util
 import ILLMayaSpaceSwitcherModel
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
-    SETTINGS = QtCore.QSettings("ILLMayaSpaceSwitcher", "ILLMayaSpaceSwitcherConfiguration")
+    SETTINGS = QtCore.QSettings("", "ILLMayaSpaceSwitcherConfiguration")
     GEOMETRY_SETTING = "geometry"
     SPLITTER_SETTING = "splitter"
 
