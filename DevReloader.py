@@ -9,4 +9,3 @@ reload(ILLMayaSpaceSwitcher.Util)
 reload(ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherModel)
 reload(ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration)
 reload(ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherManager)
-

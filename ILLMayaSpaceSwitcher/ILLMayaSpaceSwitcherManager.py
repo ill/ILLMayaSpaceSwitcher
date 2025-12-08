@@ -7,15 +7,14 @@ from maya import OpenMayaUI as omui
 # from shiboken2 import wrapInstance
 # from PySide2 import QtUiTools, QtCore, QtGui, QtWidgets
 from shiboken6 import wrapInstance
-from PySide6 import QtUiTools, QtCore, QtWidgets
+from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
 import pathlib
 
 import Util
 import ILLMayaSpaceSwitcherModel
 
 def createGroupNameWidget(groupName: str = None):
-    widgetPath = str(pathlib.Path(__file__).parent.resolve())
-    widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceGroupNameWidget.ui')
+    widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'ILLMayaSpaceGroupNameWidget.ui')
 
     lbl_spaceGroupName: QtWidgets.QLabel = widget.findChild(QtWidgets.QLabel, 'lbl_spaceGroupName')
     lbl_spaceGroupName.setText(groupName)
@@ -24,11 +23,28 @@ def createGroupNameWidget(groupName: str = None):
 
 class IllMayaSpaceWidgetWrapper:
     def __init__(self, spaceName: str = None):
-        widgetPath = str(pathlib.Path(__file__).parent.resolve())
-        self.widget = QtUiTools.QUiLoader().load(widgetPath + '\\IllMayaSpaceWidget.ui')
+        self.widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'IllMayaSpaceWidget.ui')
 
-        lbl_spaceName: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_spaceName')
-        lbl_spaceName.setText(spaceName)
+        self.lbl_spaceName: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_spaceName')
+        self.lbl_spaceName.setText(spaceName)
+
+        self.btn_matchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToControl')
+        self.btn_matchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+
+        self.btn_matchSpaceToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToSpace')
+        self.btn_matchSpaceToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+
+        self.btn_matchAndSwitchControlToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchAndSwitchControlToSpace')
+        self.btn_matchAndSwitchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+
+        self.btn_matchControlToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchControlToSpace')
+        self.btn_matchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+
+        self.btn_selectSpaceObject: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_selectSpaceObject')
+        self.btn_selectSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+
+        self.btn_zeroSpaceObject: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_zeroSpaceObject')
+        self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")
@@ -64,8 +80,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         self.spaceWidgetWrappers: list[IllMayaSpaceWidgetWrapper] = None
 
         self.setWindowFlags(QtCore.Qt.Window)
-        widgetPath = str(pathlib.Path(__file__).parent.resolve())
-        self.widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceSwitcherManager.ui')
+        self.widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'ILLMayaSpaceSwitcherManager.ui')
         self.widget.setParent(self)
 
         # Refresh Button

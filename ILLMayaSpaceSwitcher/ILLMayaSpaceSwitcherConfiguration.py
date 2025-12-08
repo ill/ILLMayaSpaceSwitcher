@@ -47,8 +47,7 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         self.selectedControl: str = None
 
         self.setWindowFlags(QtCore.Qt.Window)
-        widgetPath = str(pathlib.Path(__file__).parent.resolve())
-        self.widget = QtUiTools.QUiLoader().load(widgetPath + '\\ILLMayaSpaceSwitcherConfiguration.ui')
+        self.widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'ILLMayaSpaceSwitcherConfiguration.ui')
         self.widget.setParent(self)
 
         # Selected Control Label

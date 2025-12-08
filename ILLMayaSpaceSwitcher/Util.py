@@ -1,5 +1,9 @@
 import maya.cmds as cmds
 from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
+import pathlib
+
+PACKAGE_DIR = pathlib.Path(__file__).parent.resolve()
+ICON_DIR = PACKAGE_DIR / "resources" / "icons"
 
 def getSelectedTransforms():
     return cmds.ls(sl=True, type='transform', long=True)
