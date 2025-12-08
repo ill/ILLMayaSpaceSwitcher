@@ -22,29 +22,53 @@ def createGroupNameWidget(groupName: str = None):
     return widget
 
 class IllMayaSpaceWidgetWrapper:
-    def __init__(self, spaceName: str = None):
+    def __init__(self, space: ILLMayaSpaceSwitcherModel.SpacesIntersectionSpace):
         self.widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'IllMayaSpaceWidget.ui')
 
         self.lbl_spaceName: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_spaceName')
-        self.lbl_spaceName.setText(spaceName)
+        self.lbl_spaceName.setText(space.name)
 
         self.btn_matchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToControl')
         self.btn_matchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchSpaceToControl.clicked.connect(self.matchSpaceToControlClicked)
 
         self.btn_matchSpaceToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToSpace')
         self.btn_matchSpaceToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchSpaceToSpace.clicked.connect(self.matchSpaceToSpaceClicked)
 
         self.btn_matchAndSwitchControlToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchAndSwitchControlToSpace')
         self.btn_matchAndSwitchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchAndSwitchControlToSpace.clicked.connect(self.matchAndSwitchControlToSpaceClicked)
 
         self.btn_matchControlToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchControlToSpace')
         self.btn_matchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchControlToSpace.clicked.connect(self.matchControlToSpaceClicked)
 
         self.btn_selectSpaceObject: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_selectSpaceObject')
         self.btn_selectSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_selectSpaceObject.clicked.connect(self.selectSpaceObjectClicked)
 
         self.btn_zeroSpaceObject: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_zeroSpaceObject')
         self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_zeroSpaceObject.clicked.connect(self.zeroSpaceObject)
+
+    def matchSpaceToControlClicked(self):
+        pass
+
+    def matchSpaceToSpaceClicked(self):
+        pass
+
+    def matchAndSwitchControlToSpaceClicked(self):
+        pass
+
+    def matchControlToSpaceClicked(self):
+        pass
+
+    def selectSpaceObjectClicked(self):
+        pass
+
+    def zeroSpaceObject(self):
+        pass
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")
@@ -167,6 +191,6 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
                 self.sa_spacesListContents.layout().addWidget(createGroupNameWidget(groupName))
 
                 for space in spacesIntersectionGroup.spaces:
-                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(spaceName=space.name)
+                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(space=space)
                     self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
                     self.spaceWidgetWrappers.append(spaceWidgetWrapper)
