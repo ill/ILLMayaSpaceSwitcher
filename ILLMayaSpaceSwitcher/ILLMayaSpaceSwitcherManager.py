@@ -164,6 +164,8 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         """
         Called on automatically generated resize event
         """
+        super().resizeEvent(event)
+
         self.widget.resize(self.width(), self.height())
 
     def closeEvent(self, event):
@@ -173,7 +175,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
         ILLMayaSpaceSwitcherManager.SETTINGS.setValue(ILLMayaSpaceSwitcherManager.GEOMETRY_SETTING, self.saveGeometry())
 
-        self.destroy()
+        super().closeEvent(event)
 
     def refreshPressed(self):
         self.setSelectedControls(selectedControls=Util.getSelectedTransforms())
