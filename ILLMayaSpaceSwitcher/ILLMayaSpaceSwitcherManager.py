@@ -64,12 +64,12 @@ class IllMayaSpaceWidgetWrapper:
         self.btn_zeroSpaceObject.clicked.connect(self.zeroSpaceObject)
 
     def switchToSpaceClicked(self):
-        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isEnabled(),
-                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isEnabled())
+        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
+                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
 
     def matchAndSwitchSpaceToControlClicked(self):
-        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isEnabled(),
-                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isEnabled())
+        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
+                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
         pass
 
     def matchSpaceToControlClicked(self):
@@ -79,8 +79,8 @@ class IllMayaSpaceWidgetWrapper:
         pass
 
     def matchAndSwitchControlToSpaceClicked(self):
-        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isEnabled(),
-                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isEnabled())
+        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
+                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
         pass
 
     def matchControlToSpaceClicked(self):
