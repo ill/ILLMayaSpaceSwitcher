@@ -55,6 +55,37 @@ class Space:
                    attributeName=attributeName,
                    transformName=transformName)
 
+    # Switches to this space
+    def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
+        # Find the control we belong to
+        controlName = self.parentSpaceGroup.parentSpaces.controlName
+
+        # Find which index in the space group we belong to
+        ourSpaceIndex = self.parentSpaceGroup.spaces.index(self)
+
+        # Set the attribute of every control after us to 0
+        for spaceIndex in range(ourSpaceIndex + 1, len(self.parentSpaceGroup.spaces)):
+            space:Space = self.parentSpaceGroup.spaces[spaceIndex]
+
+            spaceAttributeName = space.attributeName
+
+            if spaceAttributeName is None:
+                raise AttributeError(f'Only the first space in the group is allowed to have no attribute, meaning it\'s a base space. Space index "{spaceIndex}" has no attribute name.')
+
+            if forceKeyIfAlreadyAtValue or cmds.getAttr(f'{controlName}.{spaceAttributeName}') != 0:
+                cmds.setAttr(f'{controlName}.{spaceAttributeName}', 0)
+
+                if keyEnabled:
+                    cmds.setKeyframe(controlName, attribute=spaceAttributeName)
+
+        # Set our attribute value to 1 if we aren't a base space and have an attribute
+        if self.attributeName is not None:
+            if forceKeyIfAlreadyAtValue or cmds.getAttr(f'{controlName}.{self.attributeName}') != 1:
+                cmds.setAttr(f'{controlName}.{self.attributeName}', 1)
+
+                if keyEnabled:
+                    cmds.setKeyframe(controlName, attribute=self.attributeName)
+
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
 class SpaceGroup:
@@ -68,7 +99,13 @@ class SpaceGroup:
 
         # The spaces themselves
         self.spaces: list[Space] = spaces
-        for space in self.spaces:
+
+        # Some setup an extra validation
+        for spaceIndex, space in enumerate(self.spaces):
+            # only the first space is allowed to not have an attribute name, meaning it's a base space
+            if spaceIndex == 0 and space.attributeName is None:
+                raise AttributeError(f'Only the first space in the group is allowed to have no attribute, meaning it\'s a base space. Space index "{spaceIndex}" has no attribute name.')
+
             space.parentSpaceGroup = self
 
     @classmethod
