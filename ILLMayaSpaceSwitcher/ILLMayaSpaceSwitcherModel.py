@@ -11,6 +11,8 @@ class Space:
                  name: str = None,
                  attributeName: str = None,
                  transformName: str = None):
+        self.parentSpaceGroup = None
+
         # Name of the space itself, usually the attribute nice name
         self.name: str = name
 
@@ -59,14 +61,18 @@ class SpaceGroup:
     def __init__(self,
                  name: str = None,
                  spaces: list[Space] = None):
+        self.parentSpaces = None
+
         # Name of the space group
         self.name: str = name
 
         # The spaces themselves
         self.spaces: list[Space] = spaces
+        for space in self.spaces:
+            space.parentSpaceGroup = self
 
     @classmethod
-    def fromJsonData(cls, controlName: str, name: str, jsonData: {}):
+    def fromJsonData(cls, parentSpaces, controlName: str, name: str, jsonData: {}):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
@@ -87,9 +93,11 @@ class Spaces:
 
         # The main spaces
         self.spaces: SpaceGroup = spaces
+        self.spaces.parentSpaces = self
 
         # The rotation only spaces
         self.rotationSpaces: SpaceGroup = rotationSpaces
+        self.rotationSpaces.parentSpaces = self
 
     @staticmethod
     def getJsonStrFromControl(controlName: str) -> str:
