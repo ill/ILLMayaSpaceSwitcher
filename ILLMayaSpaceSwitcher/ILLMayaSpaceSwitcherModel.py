@@ -5,6 +5,8 @@ import Util
 
 ILLMayaSpaceSwitcherConfigAttributeName: str = 'ILLMayaSpaceSwitcherConfig'
 
+print("Model Reloaded")
+
 # A definition of an individual space
 class Space:
     def __init__(self,
@@ -103,13 +105,13 @@ class SpaceGroup:
         # Some setup an extra validation
         for spaceIndex, space in enumerate(self.spaces):
             # only the first space is allowed to not have an attribute name, meaning it's a base space
-            if spaceIndex == 0 and space.attributeName is None:
+            if spaceIndex != 0 and space.attributeName is None:
                 raise AttributeError(f'Only the first space in the group is allowed to have no attribute, meaning it\'s a base space. Space index "{spaceIndex}" has no attribute name.')
 
             space.parentSpaceGroup = self
 
     @classmethod
-    def fromJsonData(cls, parentSpaces, controlName: str, name: str, jsonData: {}):
+    def fromJsonData(cls, controlName: str, name: str, jsonData: {}):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
@@ -130,11 +132,13 @@ class Spaces:
 
         # The main spaces
         self.spaces: SpaceGroup = spaces
-        self.spaces.parentSpaces = self
+        if self.spaces is not None:
+            self.spaces.parentSpaces = self
 
         # The rotation only spaces
         self.rotationSpaces: SpaceGroup = rotationSpaces
-        self.rotationSpaces.parentSpaces = self
+        if self.rotationSpaces is not None:
+            self.rotationSpaces.parentSpaces = self
 
     @staticmethod
     def getJsonStrFromControl(controlName: str) -> str:
@@ -173,6 +177,10 @@ class SpacesIntersectionSpace:
     def __init__(self, name: str = '', spaces:list[Space] = None):
         self.name = name
         self.spaces = spaces
+
+    def switchToSpace(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+        for space in self.spaces:
+            space.switchToSpace(keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
 class SpacesIntersectionGroup:
     def __init__(self, name: str = ''):
@@ -270,3 +278,4 @@ class SpacesIntersection:
             self.rotationSpacesIntersectionGroup.evaluateGroups([space.rotationSpaces for space in self.spaces])
         else:
             self.rotationSpacesIntersectionGroup = None
+

@@ -3,6 +3,8 @@ import ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration
 # For Development
 import DevReloader
 from importlib import reload
+
+print(f'Reloading {DevReloader.__name__}')
 reload(DevReloader)
 
 # ILLMayaSpaceSwitcher.ILLMayaSpaceSwitcherConfiguration.ILLMayaSpaceSwitcherConfiguration.wipeSettings()

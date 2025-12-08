@@ -22,11 +22,22 @@ def createGroupNameWidget(groupName: str = None):
     return widget
 
 class IllMayaSpaceWidgetWrapper:
-    def __init__(self, space: ILLMayaSpaceSwitcherModel.SpacesIntersectionSpace):
+    def __init__(self, parentManager, space: ILLMayaSpaceSwitcherModel.SpacesIntersectionSpace):
         self.widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'IllMayaSpaceWidget.ui')
+
+        self.parentManager = parentManager
+        self.space = space
 
         self.lbl_spaceName: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_spaceName')
         self.lbl_spaceName.setText(space.name)
+
+        self.btn_switchToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_switchToSpace')
+        self.btn_switchToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_switchToSpace.clicked.connect(self.switchToSpaceClicked)
+
+        self.btn_matchAndSwitchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchAndSwitchSpaceToControl')
+        self.btn_matchAndSwitchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchAndSwitchSpaceToControl.clicked.connect(self.matchAndSwitchSpaceToControlClicked)
 
         self.btn_matchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToControl')
         self.btn_matchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
@@ -52,6 +63,15 @@ class IllMayaSpaceWidgetWrapper:
         self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
         self.btn_zeroSpaceObject.clicked.connect(self.zeroSpaceObject)
 
+    def switchToSpaceClicked(self):
+        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isEnabled(),
+                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isEnabled())
+
+    def matchAndSwitchSpaceToControlClicked(self):
+        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isEnabled(),
+                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isEnabled())
+        pass
+
     def matchSpaceToControlClicked(self):
         pass
 
@@ -59,6 +79,8 @@ class IllMayaSpaceWidgetWrapper:
         pass
 
     def matchAndSwitchControlToSpaceClicked(self):
+        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isEnabled(),
+                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isEnabled())
         pass
 
     def matchControlToSpaceClicked(self):
@@ -116,6 +138,9 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
         # Key Enabled Check Box
         self.cb_keyEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_keyEnabled')
+
+        # Force Key if Already At Value Check Box
+        self.cb_forceKeyIfAlreadyAtValueEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_forceKeyIfAlreadyAtValueEnabled')
 
         # Auto Refresh Enabled Check Box
         self.cb_autoRefreshEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_autoRefreshEnabled')
@@ -191,6 +216,6 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
                 self.sa_spacesListContents.layout().addWidget(createGroupNameWidget(groupName))
 
                 for space in spacesIntersectionGroup.spaces:
-                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(space=space)
+                    spaceWidgetWrapper = IllMayaSpaceWidgetWrapper(parentManager=self, space=space)
                     self.sa_spacesListContents.layout().addWidget(spaceWidgetWrapper.widget)
                     self.spaceWidgetWrappers.append(spaceWidgetWrapper)

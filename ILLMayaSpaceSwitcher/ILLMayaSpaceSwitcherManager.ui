@@ -55,7 +55,7 @@
         <x>0</x>
         <y>0</y>
         <width>472</width>
-        <height>80</height>
+        <height>68</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -92,6 +92,13 @@
       <widget class="QCheckBox" name="cb_keyEnabled">
        <property name="text">
         <string>Key Enabled</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_forceKeyIfAlreadyAtValueEnabled">
+       <property name="text">
+        <string>Force Key if Already At Value</string>
        </property>
       </widget>
      </item>

@@ -35,6 +35,34 @@
     </spacer>
    </item>
    <item>
+    <widget class="QPushButton" name="btn_switchToSpace">
+     <property name="toolTip">
+      <string>Switches to this space.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btn_matchAndSwitchSpaceToControl">
+     <property name="toolTip">
+      <string>Matches the space to the control so the space is relative to the current control's transform. Also switches to this space.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="btn_matchSpaceToControl">
      <property name="toolTip">
       <string>Matches the space to the control so the space is relative to the current control's transform.</string>
