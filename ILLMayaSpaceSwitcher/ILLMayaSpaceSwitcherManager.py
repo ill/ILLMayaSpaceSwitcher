@@ -11,8 +11,8 @@ from shiboken6 import wrapInstance
 from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
 import pathlib
 
-import Util
-import ILLMayaSpaceSwitcherModel
+from . import Util
+from . import ILLMayaSpaceSwitcherModel
 
 def createGroupNameWidget(groupName: str = None):
     widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'ILLMayaSpaceGroupNameWidget.ui')

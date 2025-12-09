@@ -2,7 +2,7 @@ import json
 import maya.cmds as cmds
 import maya.api.OpenMaya as om
 
-import Util
+from . import Util
 
 ILLMayaSpaceSwitcherConfigAttributeName: str = 'ILLMayaSpaceSwitcherConfig'
 

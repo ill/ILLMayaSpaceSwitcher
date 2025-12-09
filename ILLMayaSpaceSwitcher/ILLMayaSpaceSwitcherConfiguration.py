@@ -11,8 +11,8 @@ from shiboken6 import wrapInstance
 from PySide6 import QtUiTools, QtCore, QtWidgets
 import pathlib
 
-import Util
-import ILLMayaSpaceSwitcherModel
+from . import Util
+from . import ILLMayaSpaceSwitcherModel
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherConfiguration")
