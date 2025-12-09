@@ -1,6 +1,7 @@
 import json
 import maya.cmds as cmds
 import maya.api.OpenMaya as om
+import math
 
 from . import Util
 
@@ -100,6 +101,14 @@ class Space:
 
         return -jointOrient[0], -jointOrient[1], -jointOrient[2]
 
+    def getControlRotationSpaceLocalRotationMatrix(self):
+        controlRotationSpaceLocalRotation = self.getControlRotationSpaceLocalRotation()
+
+        return om.MEulerRotation(math.radians(controlRotationSpaceLocalRotation[0]),
+                                 math.radians(controlRotationSpaceLocalRotation[1]),
+                                 math.radians(controlRotationSpaceLocalRotation[2]),
+                                 Util.getOmRotationOrder(self.getControlName())).asMatrix()
+
     # Switches to this space
     def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
         # Set the attribute of every control after us to 0
@@ -152,18 +161,20 @@ class Space:
             if self.isRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
 
-                controlRotationSpaceLocalRotation = self.getControlRotationSpaceLocalRotation()
+                controlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationMatrix()
 
-                rotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
+                destinationRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
 
-                rotationSpaceLocalRotationRadians = om.MTransformationMatrix(rotationSpaceLocalTransform).rotation()
-                rotationSpaceLocalRotation = (om.MAngle(rotationSpaceLocalRotationRadians.x).asDegrees(),
-                                              om.MAngle(rotationSpaceLocalRotationRadians.y).asDegrees(),
-                                              om.MAngle(rotationSpaceLocalRotationRadians.z).asDegrees())
+                relativeRot = controlRotationSpaceLocalRotationTransform * destinationRotationSpaceLocalTransform.inverse()
 
-                cmds.rotate(controlRotationSpaceLocalRotation[0]-rotationSpaceLocalRotation[0],
-                            controlRotationSpaceLocalRotation[1]-rotationSpaceLocalRotation[1],
-                            controlRotationSpaceLocalRotation[2]-rotationSpaceLocalRotation[2],
+                destinationRotationSpaceLocalRotationRadians = om.MTransformationMatrix(relativeRot).rotation()
+                destinationRotationSpaceLocalRotation = (om.MAngle(destinationRotationSpaceLocalRotationRadians.x).asDegrees(),
+                                                         om.MAngle(destinationRotationSpaceLocalRotationRadians.y).asDegrees(),
+                                                         om.MAngle(destinationRotationSpaceLocalRotationRadians.z).asDegrees())
+
+                cmds.rotate(destinationRotationSpaceLocalRotation[0],
+                            destinationRotationSpaceLocalRotation[1],
+                            destinationRotationSpaceLocalRotation[2],
                             self.getControlName(),
                             relative=True)
 
@@ -173,7 +184,7 @@ class Space:
             else:
                 # Find relative transform between control and the space, set control transform to that relative transform
 
-                controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceInverseLocalRotation()
+                controlRotationSpaceLocalRotationPreTransform = self.getControlRotationSpaceLocalRotation()
 
                 controlWorldTransform = self.getControlWorldTransform()
                 transformInverseWorldTransform = self.getTransformInverseWorldTransform()
@@ -183,10 +194,12 @@ class Space:
                 # Set the control to the new transform
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
 
+                controlRotationSpaceLocalRotationPostTransform = self.getControlRotationSpaceLocalRotation()
+
                 # Counter rotate to account for the rotation space
-                cmds.rotate(controlRotationSpaceInverseLocalRotation[0],
-                            controlRotationSpaceInverseLocalRotation[1],
-                            controlRotationSpaceInverseLocalRotation[2],
+                cmds.rotate(controlRotationSpaceLocalRotationPreTransform[0] - controlRotationSpaceLocalRotationPostTransform[0],
+                            controlRotationSpaceLocalRotationPreTransform[1] - controlRotationSpaceLocalRotationPostTransform[1],
+                            controlRotationSpaceLocalRotationPreTransform[2] - controlRotationSpaceLocalRotationPostTransform[2],
                             self.getControlName(),
                             relative=True)
 

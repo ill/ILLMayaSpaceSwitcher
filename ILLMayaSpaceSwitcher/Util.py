@@ -1,4 +1,5 @@
 import maya.cmds as cmds
+import maya.api.OpenMaya as om
 from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
 import pathlib
 
@@ -48,3 +49,13 @@ def keyTransforms(node:str):
 
 def keyRotation(node:str):
     cmds.setKeyframe(node, attribute=['rotateX', 'rotateY', 'rotateZ'])
+
+def getOmRotationOrder(node:str):
+    return [
+        om.MEulerRotation.kXYZ,
+        om.MEulerRotation.kYZX,
+        om.MEulerRotation.kZXY,
+        om.MEulerRotation.kXZY,
+        om.MEulerRotation.kYXZ,
+        om.MEulerRotation.kZYX,
+    ][cmds.getAttr(f'{node}.rotateOrder')]
