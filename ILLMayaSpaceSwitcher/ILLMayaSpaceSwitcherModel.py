@@ -65,28 +65,18 @@ class Space:
 
     # Switches to this space
     def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
-        controlName = self.getControlName()
-        ourSpaceIndex = self.getSpaceIndex()
-
         # Set the attribute of every control after us to 0
-        for spaceIndex in range(ourSpaceIndex + 1, len(self.parentSpaceGroup.spaces)):
-            space:Space = self.parentSpaceGroup.spaces[spaceIndex]
+        for spaceIndex in range(self.getSpaceIndex() + 1, len(self.parentSpaceGroup.spaces)):
+            self.parentSpaceGroup.spaces[spaceIndex].setAttribute(attributeValue=0, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
-            spaceAttributeName = space.attributeName
+        self.setAttribute(attributeValue=1, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
-            if spaceAttributeName is None:
-                raise AttributeError(f'Only the first space in the group is allowed to have no attribute, meaning it\'s a base space. Space index "{spaceIndex}" has no attribute name.')
-
-            if forceKeyIfAlreadyAtValue or cmds.getAttr(f'{controlName}.{spaceAttributeName}') != 0:
-                cmds.setAttr(f'{controlName}.{spaceAttributeName}', 0)
-
-                if keyEnabled:
-                    cmds.setKeyframe(controlName, attribute=spaceAttributeName)
-
-        # Set our attribute value to 1 if we aren't a base space and have an attribute
+    def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         if self.attributeName is not None:
-            if forceKeyIfAlreadyAtValue or cmds.getAttr(f'{controlName}.{self.attributeName}') != 1:
-                cmds.setAttr(f'{controlName}.{self.attributeName}', 1)
+            controlName = self.getControlName()
+
+            if forceKeyIfAlreadyAtValue or cmds.getAttr(f'{controlName}.{self.attributeName}') != attributeValue:
+                cmds.setAttr(f'{controlName}.{self.attributeName}', attributeValue)
 
                 if keyEnabled:
                     cmds.setKeyframe(controlName, attribute=self.attributeName)
@@ -202,6 +192,10 @@ class SpacesIntersectionSpace:
     def switchToSpace(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         for space in self.spaces:
             space.switchToSpace(keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+
+    def setAttribute(self, attributeValue:float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+        for space in self.spaces:
+            space.setAttribute(attributeValue=attributeValue, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
     def selectTransform(self):
         cmds.select(clear=True)

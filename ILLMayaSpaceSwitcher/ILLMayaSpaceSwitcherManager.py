@@ -45,7 +45,7 @@ class IllMayaSpaceWidgetWrapper:
         # Disable Space Button
         self.btn_disableSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_disableSpace')
         self.btn_disableSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'DisableSpace.png')))
-        self.btn_disableSpace.clicked.connect(self.enableSpaceClicked)
+        self.btn_disableSpace.clicked.connect(self.disableSpaceClicked)
 
         # Match and Switch Space to Control Button
         self.btn_matchAndSwitchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchAndSwitchSpaceToControl')
@@ -87,15 +87,19 @@ class IllMayaSpaceWidgetWrapper:
                                  forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
 
     def enableSpaceClicked(self):
-        pass
+        self.space.setAttribute(attributeValue=1,
+                                keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
+                                forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
 
     def disableSpaceClicked(self):
-        pass
+        self.space.setAttribute(attributeValue=0,
+                                keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
+                                forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
 
     def matchAndSwitchSpaceToControlClicked(self):
+        # TODO: Implement
         self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
                                  forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
-        pass
 
     def matchSpaceToControlClicked(self):
         pass
@@ -104,9 +108,9 @@ class IllMayaSpaceWidgetWrapper:
         pass
 
     def matchAndSwitchControlToSpaceClicked(self):
+        # TODO: Implement
         self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
                                  forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
-        pass
 
     def matchControlToSpaceClicked(self):
         pass
