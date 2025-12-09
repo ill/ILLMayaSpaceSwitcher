@@ -57,13 +57,16 @@ class Space:
                    attributeName=attributeName,
                    transformName=transformName)
 
+    def getControlName(self) -> str:
+        return self.parentSpaceGroup.parentSpaces.controlName
+
+    def getSpaceIndex(self) -> int:
+        return self.parentSpaceGroup.spaces.index(self)
+
     # Switches to this space
     def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
-        # Find the control we belong to
-        controlName = self.parentSpaceGroup.parentSpaces.controlName
-
-        # Find which index in the space group we belong to
-        ourSpaceIndex = self.parentSpaceGroup.spaces.index(self)
+        controlName = self.getControlName()
+        ourSpaceIndex = self.getSpaceIndex()
 
         # Set the attribute of every control after us to 0
         for spaceIndex in range(ourSpaceIndex + 1, len(self.parentSpaceGroup.spaces)):
@@ -87,6 +90,24 @@ class Space:
 
                 if keyEnabled:
                     cmds.setKeyframe(controlName, attribute=self.attributeName)
+
+    def selectTransform(self):
+        if self.transformName is not None:
+            cmds.select(self.transformName, add=True)
+
+    def zeroTransform(self):
+        if self.transformName is not None:
+            cmds.setAttr(f'{self.transformName}.translateX', 0)
+            cmds.setAttr(f'{self.transformName}.translateY', 0)
+            cmds.setAttr(f'{self.transformName}.translateZ', 0)
+
+            cmds.setAttr(f'{self.transformName}.rotateX', 0)
+            cmds.setAttr(f'{self.transformName}.rotateY', 0)
+            cmds.setAttr(f'{self.transformName}.rotateZ', 0)
+
+            cmds.setAttr(f'{self.transformName}.scaleX', 1)
+            cmds.setAttr(f'{self.transformName}.scaleY', 1)
+            cmds.setAttr(f'{self.transformName}.scaleZ', 1)
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
@@ -181,6 +202,16 @@ class SpacesIntersectionSpace:
     def switchToSpace(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         for space in self.spaces:
             space.switchToSpace(keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+
+    def selectTransform(self):
+        cmds.select(clear=True)
+
+        for space in self.spaces:
+            space.selectTransform()
+
+    def zeroTransform(self):
+        for space in self.spaces:
+            space.zeroTransform()
 
 class SpacesIntersectionGroup:
     def __init__(self, name: str = ''):

@@ -2,6 +2,7 @@
 # import ILLMayaSpaceSwitcherManager
 # ILLMayaSpaceSwitcherManager.ILLMayaSpaceSwitcherManager.openMayaMainToolWindowInstance()
 
+import maya.cmds as cmds
 from maya import OpenMayaUI as omui
 # TODO: Figure out maya < 2025 and >= 2025 support
 # from shiboken2 import wrapInstance
@@ -111,10 +112,10 @@ class IllMayaSpaceWidgetWrapper:
         pass
 
     def selectSpaceObjectClicked(self):
-        pass
+        self.space.selectTransform()
 
     def zeroSpaceObject(self):
-        pass
+        self.space.zeroTransform()
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")
