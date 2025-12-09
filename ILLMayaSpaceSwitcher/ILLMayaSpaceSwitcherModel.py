@@ -66,25 +66,25 @@ class Space:
         return self.parentSpaceGroup == self.parentSpaceGroup.parentSpaces.rotationSpaces
 
     def getTransformParentInverseWorldTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.transformName}.parentInverseMatrix')[0])
+        return om.MMatrix(cmds.getAttr(f'{self.transformName}.parentInverseMatrix'))
 
     def getControlWorldTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.worldMatrix')[0])
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.worldMatrix'))
 
-    def getControlSpaceLocalTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.matrix')[0])
+    def getControlLocalTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.matrix'))
 
-    def getControlSpaceInverseLocalTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.inverseMatrix')[0])
+    def getControlInverseLocalTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.inverseMatrix'))
 
-    def getControlRotationSpaceLocalRotation(self):
+    def getControlLocalRotation(self):
         if not self.isRotationSpace():
             raise TypeError(f'Should only be trying to call getControlRotationSpaceLocalRotation on rotation spaces')
 
-        return cmds.getAttr(f'{self.getControlName()}.jointOrient')[0]
+        return cmds.getAttr(f'{self.getControlName()}.jointOrient')
 
-    def getControlRotationSpaceInverseLocalRotation(self):
-        jointOrient = self.getControlRotationSpaceLocalRotation()
+    def getControlInverseLocalRotation(self):
+        jointOrient = self.getControlLocalRotation()
 
         return -jointOrient[0], -jointOrient[1], -jointOrient[2]
 
@@ -102,8 +102,10 @@ class Space:
             if self.isRotationSpace():
                 pass
             else:
+                # TODO: if has rotation space, account for the joint orient
+
                 controlWorldTransform = self.getControlWorldTransform()
-                inverseLocalTransform = self.getControlRotationSpaceInverseLocalRotation()
+                inverseLocalTransform = self.getControlInverseLocalTransform()
 
                 destinationWorldTransform = inverseLocalTransform * controlWorldTransform
                 destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform() # TODO: Or is this inverted?
