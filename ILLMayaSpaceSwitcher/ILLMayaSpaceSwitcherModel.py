@@ -1,11 +1,10 @@
 import json
 import maya.cmds as cmds
+import maya.api.OpenMaya as om
 
 import Util
 
 ILLMayaSpaceSwitcherConfigAttributeName: str = 'ILLMayaSpaceSwitcherConfig'
-
-print("Model Reloaded")
 
 # A definition of an individual space
 class Space:
@@ -63,6 +62,32 @@ class Space:
     def getSpaceIndex(self) -> int:
         return self.parentSpaceGroup.spaces.index(self)
 
+    def isRotationSpace(self) -> bool:
+        return self.parentSpaceGroup == self.parentSpaceGroup.parentSpaces.rotationSpaces
+
+    def getTransformParentInverseWorldTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.transformName}.parentInverseMatrix')[0])
+
+    def getControlWorldTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.worldMatrix')[0])
+
+    def getControlSpaceLocalTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.matrix')[0])
+
+    def getControlSpaceInverseLocalTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.inverseMatrix')[0])
+
+    def getControlRotationSpaceLocalRotation(self):
+        if not self.isRotationSpace():
+            raise TypeError(f'Should only be trying to call getControlRotationSpaceLocalRotation on rotation spaces')
+
+        return cmds.getAttr(f'{self.getControlName()}.jointOrient')[0]
+
+    def getControlRotationSpaceInverseLocalRotation(self):
+        jointOrient = self.getControlRotationSpaceLocalRotation()
+
+        return -jointOrient[0], -jointOrient[1], -jointOrient[2]
+
     # Switches to this space
     def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
         # Set the attribute of every control after us to 0
@@ -70,6 +95,35 @@ class Space:
             self.parentSpaceGroup.spaces[spaceIndex].setAttribute(attributeValue=0, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
         self.setAttribute(attributeValue=1, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+
+    def matchToControl(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+        if self.transformName is not None:
+            # Find control relative transform, put us at the inverse of that
+            if self.isRotationSpace():
+                pass
+            else:
+                controlWorldTransform = self.getControlWorldTransform()
+                inverseLocalTransform = self.getControlRotationSpaceInverseLocalRotation()
+
+                destinationWorldTransform = inverseLocalTransform * controlWorldTransform
+                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform() # TODO: Or is this inverted?
+
+                cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
+
+    def matchToSpace(self, spaceToMatch, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+        # If this is a rotation space, we're finding the control joint orient
+        # Otherwise we're getting the control relative transform to its parent
+
+        # Find the transform of the control relative to the parent space
+
+        if self.transformName is not None and spaceToMatch.transformName is not None:
+            if self.isRotationSpace():
+                pass
+            else:
+                inverseLocalTransform = self.getControlRotationSpaceInverseLocalRotation()
+
+    def matchControlToSpace(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+        pass
 
     def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         if self.attributeName is not None:
@@ -180,12 +234,17 @@ class Spaces:
         spacesJsonData = jsonData.get('Spaces', None)
         rotationSpacesJsonData = jsonData.get('Rotation Spaces', None)
 
+        # Rotation spaces should only exist on controls that are "joints"
+        if not cmds.nodeType(controlName) == 'joint':
+            raise TypeError(f'Rotation spaces should only exist on joint type controls because it uses the joint orient to control the rotation space')
+
         return cls(controlName=controlName,
                    spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
                    rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
 
 class SpacesIntersectionSpace:
-    def __init__(self, name: str = '', spaces:list[Space] = None):
+    def __init__(self, parentSpacesIntersectionGroup, name: str = '', spaces:list[Space] = None):
+        self.parentSpacesIntersectionGroup = parentSpacesIntersectionGroup
         self.name = name
         self.spaces = spaces
 
@@ -196,6 +255,12 @@ class SpacesIntersectionSpace:
     def setAttribute(self, attributeValue:float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         for space in self.spaces:
             space.setAttribute(attributeValue=attributeValue, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+
+    def matchToSpace(self, spacesIntersectionToMatch, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+        for space in self.spaces:
+            for spaceToMatch in spacesIntersectionToMatch.spaces:
+                if space.parentSpaceGroup == spaceToMatch.parentSpaceGroup:
+                    space.matchToSpace(spaceToMatch=spaceToMatch, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
     def selectTransform(self):
         cmds.select(clear=True)
@@ -208,7 +273,8 @@ class SpacesIntersectionSpace:
             space.zeroTransform()
 
 class SpacesIntersectionGroup:
-    def __init__(self, name: str = ''):
+    def __init__(self, parentSpacesIntersection, name: str = ''):
+        self.parentSpacesIntersection = parentSpacesIntersection
         self.name = name
         self.spaces: list[SpacesIntersectionSpace] = None
 
@@ -219,7 +285,7 @@ class SpacesIntersectionGroup:
             return
 
         # First create an array from the very first selected group of space names
-        self.spaces = [SpacesIntersectionSpace(space.name, [space]) for space in spaceGroups[0].spaces]
+        self.spaces = [SpacesIntersectionSpace(parentSpacesIntersectionGroup=self, name=space.name, spaces=[space]) for space in spaceGroups[0].spaces]
 
         # Now go through every subsequent space and check to see if the names are in the same orders of the space names sets so far
         for groupIndex in range(1, len(spaceGroups)):
@@ -293,13 +359,13 @@ class SpacesIntersection:
                 allSpacesHaveRotationSpaces = False
 
         if allSpacesHaveSpaces:
-            self.spacesIntersectionGroup = SpacesIntersectionGroup("Spaces")
+            self.spacesIntersectionGroup = SpacesIntersectionGroup(parentSpacesIntersection=self, name="Spaces")
             self.spacesIntersectionGroup.evaluateGroups([space.spaces for space in self.spaces])
         else:
             self.spacesIntersectionGroup = None
 
         if allSpacesHaveRotationSpaces:
-            self.rotationSpacesIntersectionGroup = SpacesIntersectionGroup("Rotation Spaces")
+            self.rotationSpacesIntersectionGroup = SpacesIntersectionGroup(parentSpacesIntersection=self, name="Rotation Spaces")
             self.rotationSpacesIntersectionGroup.evaluateGroups([space.rotationSpaces for space in self.spaces])
         else:
             self.rotationSpacesIntersectionGroup = None

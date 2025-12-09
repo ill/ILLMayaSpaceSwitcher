@@ -82,37 +82,58 @@ class IllMayaSpaceWidgetWrapper:
         self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'ZeroSpaceObject.png')))
         self.btn_zeroSpaceObject.clicked.connect(self.zeroSpaceObject)
 
+    def keyEnabled(self) -> bool:
+        return self.parentManager.keyEnabled()
+
+    def forceKeyIfAlreadyAtValueEnabled(self) -> bool:
+        return self.parentManager.forceKeyIfAlreadyAtValueEnabled()
+
     def switchToSpaceClicked(self):
-        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
-                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+        self.space.switchToSpace(keyEnabled=self.keyEnabled(),
+                                 forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def enableSpaceClicked(self):
         self.space.setAttribute(attributeValue=1,
-                                keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
-                                forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+                                keyEnabled=self.keyEnabled(),
+                                forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def disableSpaceClicked(self):
         self.space.setAttribute(attributeValue=0,
-                                keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
-                                forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+                                keyEnabled=self.keyEnabled(),
+                                forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchAndSwitchSpaceToControlClicked(self):
         # TODO: Implement
-        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
-                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+        self.space.switchToSpace(keyEnabled=self.keyEnabled(),
+                                 forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchSpaceToControlClicked(self):
+        # TODO: Implement
         pass
 
     def matchSpaceToSpaceClicked(self):
-        pass
+        # Show popup menu of spaces excluding ours
+        menu = QtWidgets.QMenu(self.widget)
+
+        for space in self.space.parentSpacesIntersectionGroup.spaces:
+            if space != self.space:
+                action = menu.addAction(space.name)
+                action.setData(space)
+
+        chosenSpace = menu.exec(self.btn_matchSpaceToSpace.mapToGlobal(self.btn_matchSpaceToSpace.rect().bottomLeft()))
+
+        if chosenSpace is not None:
+            self.space.matchToSpace(spacesIntersectionToMatch=chosenSpace.data(),
+                                    keyEnabled=self.keyEnabled(),
+                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchAndSwitchControlToSpaceClicked(self):
         # TODO: Implement
-        self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
-                                 forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+        self.space.switchToSpace(keyEnabled=self.keyEnabled(),
+                                 forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchControlToSpaceClicked(self):
+        # TODO: Implement
         pass
 
     def selectSpaceObjectClicked(self):
@@ -188,6 +209,12 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
                 self.restoreGeometry(restoredGeometry)
             except Exception as e:
                 self.resize(800, 480)
+
+    def keyEnabled(self) -> bool:
+        return self.cb_keyEnabled.isChecked()
+
+    def forceKeyIfAlreadyAtValueEnabled(self) -> bool:
+        return self.cb_forceKeyIfAlreadyAtValueEnabled.isChecked()
 
     def resizeEvent(self, event):
         """

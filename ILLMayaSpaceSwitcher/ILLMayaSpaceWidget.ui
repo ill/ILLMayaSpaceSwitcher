@@ -97,7 +97,7 @@
    <item>
     <widget class="QPushButton" name="btn_matchAndSwitchSpaceToControl">
      <property name="toolTip">
-      <string>Matches the space to the control so the space is relative to the current control's transform. Also switches to this space.</string>
+      <string>Matches the space to the current control space so the space is relative to the current control's transform. Also switches to this space.</string>
      </property>
      <property name="text">
       <string/>
@@ -117,7 +117,7 @@
    <item>
     <widget class="QPushButton" name="btn_matchSpaceToControl">
      <property name="toolTip">
-      <string>Matches the space to the control so the space is relative to the current control's transform.</string>
+      <string>Matches the space to the control space so the space is relative to the current control's transform.</string>
      </property>
      <property name="text">
       <string/>
