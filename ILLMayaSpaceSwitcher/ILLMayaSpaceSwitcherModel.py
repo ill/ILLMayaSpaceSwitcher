@@ -101,7 +101,7 @@ class Space:
 
         return -jointOrient[0], -jointOrient[1], -jointOrient[2]
 
-    def getControlRotationSpaceLocalRotationMatrix(self):
+    def getControlRotationSpaceLocalRotationTransform(self):
         controlRotationSpaceLocalRotation = self.getControlRotationSpaceLocalRotation()
 
         return om.MEulerRotation(math.radians(controlRotationSpaceLocalRotation[0]),
@@ -161,20 +161,20 @@ class Space:
             if self.isRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
 
-                controlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationMatrix()
+                currentControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
 
-                destinationRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
+                destinationControlRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
 
-                relativeRot = controlRotationSpaceLocalRotationTransform * destinationRotationSpaceLocalTransform.inverse()
+                destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
 
-                destinationRotationSpaceLocalRotationRadians = om.MTransformationMatrix(relativeRot).rotation()
-                destinationRotationSpaceLocalRotation = (om.MAngle(destinationRotationSpaceLocalRotationRadians.x).asDegrees(),
-                                                         om.MAngle(destinationRotationSpaceLocalRotationRadians.y).asDegrees(),
-                                                         om.MAngle(destinationRotationSpaceLocalRotationRadians.z).asDegrees())
+                rotationSpaceLocalTransformCounterRotateRadians = om.MTransformationMatrix(destinationToCurrentRelativeTransform).rotation()
+                rotationSpaceLocalTransformCounterRotate = (om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.x).asDegrees(),
+                                                         om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.y).asDegrees(),
+                                                         om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.z).asDegrees())
 
-                cmds.rotate(destinationRotationSpaceLocalRotation[0],
-                            destinationRotationSpaceLocalRotation[1],
-                            destinationRotationSpaceLocalRotation[2],
+                cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
+                            rotationSpaceLocalTransformCounterRotate[1],
+                            rotationSpaceLocalTransformCounterRotate[2],
                             self.getControlName(),
                             relative=True)
 
