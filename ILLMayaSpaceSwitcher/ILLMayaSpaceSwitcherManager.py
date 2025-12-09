@@ -31,41 +31,65 @@ class IllMayaSpaceWidgetWrapper:
         self.lbl_spaceName: QtWidgets.QLabel = self.widget.findChild(QtWidgets.QLabel, 'lbl_spaceName')
         self.lbl_spaceName.setText(space.name)
 
+        # Switch to Space Button
         self.btn_switchToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_switchToSpace')
-        self.btn_switchToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_switchToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'EnableAndSwitchToSpace.png')))
         self.btn_switchToSpace.clicked.connect(self.switchToSpaceClicked)
 
+        # Enable Space Button
+        self.btn_enableSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_enableSpace')
+        self.btn_enableSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'EnableSpace.png')))
+        self.btn_enableSpace.clicked.connect(self.enableSpaceClicked)
+
+        # Disable Space Button
+        self.btn_disableSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_disableSpace')
+        self.btn_disableSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'DisableSpace.png')))
+        self.btn_disableSpace.clicked.connect(self.enableSpaceClicked)
+
+        # Match and Switch Space to Control Button
         self.btn_matchAndSwitchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchAndSwitchSpaceToControl')
-        self.btn_matchAndSwitchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchAndSwitchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'MatchAndSwitchSpaceToControl.png')))
         self.btn_matchAndSwitchSpaceToControl.clicked.connect(self.matchAndSwitchSpaceToControlClicked)
 
+        # Match Space to Control Button
         self.btn_matchSpaceToControl: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToControl')
-        self.btn_matchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchSpaceToControl.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'MatchSpaceToControl.png')))
         self.btn_matchSpaceToControl.clicked.connect(self.matchSpaceToControlClicked)
 
+        # Match Space to Space Button
         self.btn_matchSpaceToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchSpaceToSpace')
-        self.btn_matchSpaceToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchSpaceToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'MatchSpaceToSpace.png')))
         self.btn_matchSpaceToSpace.clicked.connect(self.matchSpaceToSpaceClicked)
 
+        # Match and Switch Control to Space Button
         self.btn_matchAndSwitchControlToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchAndSwitchControlToSpace')
-        self.btn_matchAndSwitchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchAndSwitchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'MatchControlToSpaceAndSwitch.png')))
         self.btn_matchAndSwitchControlToSpace.clicked.connect(self.matchAndSwitchControlToSpaceClicked)
 
+        # Match control to Space Button
         self.btn_matchControlToSpace: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_matchControlToSpace')
-        self.btn_matchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_matchControlToSpace.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'MatchControlToSpace.png')))
         self.btn_matchControlToSpace.clicked.connect(self.matchControlToSpaceClicked)
 
+        # Select Space Object Button
         self.btn_selectSpaceObject: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_selectSpaceObject')
-        self.btn_selectSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_selectSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'SelectSpaceObject.png')))
         self.btn_selectSpaceObject.clicked.connect(self.selectSpaceObjectClicked)
 
+        # Zero Space Object Button
         self.btn_zeroSpaceObject: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_zeroSpaceObject')
-        self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'IconWIP.png')))
+        self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'ZeroSpaceObject.png')))
         self.btn_zeroSpaceObject.clicked.connect(self.zeroSpaceObject)
 
     def switchToSpaceClicked(self):
         self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
                                  forceKeyIfAlreadyAtValue=self.parentManager.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+
+    def enableSpaceClicked(self):
+        pass
+
+    def disableSpaceClicked(self):
+        pass
 
     def matchAndSwitchSpaceToControlClicked(self):
         self.space.switchToSpace(keyEnabled=self.parentManager.cb_keyEnabled.isChecked(),
