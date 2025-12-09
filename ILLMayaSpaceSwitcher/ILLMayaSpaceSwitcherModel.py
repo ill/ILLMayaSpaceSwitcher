@@ -93,10 +93,10 @@ class Space:
         if not self.hasRotationSpace():
             return 0.0, 0.0, 0.0
 
-        return cmds.getAttr(f'{self.getControlName()}.jointOrient')
+        return cmds.getAttr(f'{self.getControlName()}.jointOrient')[0]
 
     def getControlRotationSpaceInverseLocalRotation(self):
-        jointOrient = self.getControlLocalRotation()
+        jointOrient = self.getControlRotationSpaceLocalRotation()
 
         return -jointOrient[0], -jointOrient[1], -jointOrient[2]
 
@@ -152,7 +152,7 @@ class Space:
             if self.isRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
 
-                controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceInverseLocalRotation()
+                controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceLocalRotation()
 
                 rotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
 
