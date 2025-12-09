@@ -152,7 +152,7 @@ class Space:
             if self.isRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
 
-                controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceLocalRotation()
+                controlRotationSpaceLocalRotation = self.getControlRotationSpaceLocalRotation()
 
                 rotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
 
@@ -161,9 +161,9 @@ class Space:
                                               om.MAngle(rotationSpaceLocalRotationRadians.y).asDegrees(),
                                               om.MAngle(rotationSpaceLocalRotationRadians.z).asDegrees())
 
-                cmds.rotate(controlRotationSpaceInverseLocalRotation[0]-rotationSpaceLocalRotation[0],
-                            controlRotationSpaceInverseLocalRotation[1]-rotationSpaceLocalRotation[1],
-                            controlRotationSpaceInverseLocalRotation[2]-rotationSpaceLocalRotation[2],
+                cmds.rotate(controlRotationSpaceLocalRotation[0]-rotationSpaceLocalRotation[0],
+                            controlRotationSpaceLocalRotation[1]-rotationSpaceLocalRotation[1],
+                            controlRotationSpaceLocalRotation[2]-rotationSpaceLocalRotation[2],
                             self.getControlName(),
                             relative=True)
 
