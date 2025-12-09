@@ -109,9 +109,10 @@ class Space:
         if self.transformName is not None:
             # Find control relative transform, put us at the inverse of that
             if self.isRotationSpace():
+                # TODO: Implement
                 pass
             else:
-                # TODO: if has rotation space, account for the joint orient
+                # TODO: if has rotation space, account for the joint orient? Seems to work actually
 
                 controlWorldTransform = self.getControlWorldTransform()
                 inverseLocalTransform = self.getControlInverseLocalTransform()
@@ -130,8 +131,11 @@ class Space:
 
         if self.transformName is not None and spaceToMatch.transformName is not None:
             if self.isRotationSpace():
+                # TODO: Implement
                 pass
             else:
+                # TODO: if has rotation space, account for the joint orient? Seems to work actually
+
                 destinationWorldTransform = spaceToMatch.getTransformWorldTransform()
                 destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()  # TODO: Or is this inverted?
 
@@ -144,6 +148,7 @@ class Space:
         if self.transformName is not None:
             # Find relative transform between control and the space, set control transform to that relative transform
             if self.isRotationSpace():
+                # TODO: Implement
                 pass
             else:
                 controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceInverseLocalRotation()
@@ -153,8 +158,10 @@ class Space:
 
                 destinationControlLocalTransform = controlWorldTransform * transformInverseWorldTransform
 
+                # Set the control to the new transform
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
 
+                # Counter rotate to account for the rotation space
                 cmds.rotate(controlRotationSpaceInverseLocalRotation[0],
                             controlRotationSpaceInverseLocalRotation[1],
                             controlRotationSpaceInverseLocalRotation[2],
