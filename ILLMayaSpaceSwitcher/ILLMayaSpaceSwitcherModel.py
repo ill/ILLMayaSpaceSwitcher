@@ -65,6 +65,9 @@ class Space:
     def isRotationSpace(self) -> bool:
         return self.parentSpaceGroup == self.parentSpaceGroup.parentSpaces.rotationSpaces
 
+    def hasRotationSpace(self) -> bool:
+        return self.parentSpaceGroup.parentSpaces.rotationSpaces is not None
+
     def getTransformWorldTransform(self):
         return om.MMatrix(cmds.getAttr(f'{self.transformName}.worldMatrix'))
 
@@ -83,13 +86,13 @@ class Space:
     def getControlInverseLocalTransform(self):
         return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.inverseMatrix'))
 
-    def getControlLocalRotation(self):
-        if not self.isRotationSpace():
-            raise TypeError(f'Should only be trying to call getControlRotationSpaceLocalRotation on rotation spaces')
+    def getControlRotationSpaceLocalRotation(self):
+        if not self.hasRotationSpace():
+            return 0.0, 0.0, 0.0
 
         return cmds.getAttr(f'{self.getControlName()}.jointOrient')
 
-    def getControlInverseLocalRotation(self):
+    def getControlRotationSpaceInverseLocalRotation(self):
         jointOrient = self.getControlLocalRotation()
 
         return -jointOrient[0], -jointOrient[1], -jointOrient[2]
@@ -143,7 +146,7 @@ class Space:
             if self.isRotationSpace():
                 pass
             else:
-                # TODO: if has rotation space, account for the joint orient
+                controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceInverseLocalRotation()
 
                 controlWorldTransform = self.getControlWorldTransform()
                 transformInverseWorldTransform = self.getTransformInverseWorldTransform()
@@ -151,6 +154,12 @@ class Space:
                 destinationControlLocalTransform = controlWorldTransform * transformInverseWorldTransform
 
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
+
+                cmds.rotate(controlRotationSpaceInverseLocalRotation[0],
+                            controlRotationSpaceInverseLocalRotation[1],
+                            controlRotationSpaceInverseLocalRotation[2],
+                            self.getControlName(),
+                            relative=True)
 
                 if keyEnabled:
                     Util.keyTransforms(self.getControlName())
