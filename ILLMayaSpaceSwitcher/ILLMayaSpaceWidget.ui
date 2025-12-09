@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>398</width>
-    <height>32</height>
+    <width>570</width>
+    <height>40</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,7 +44,47 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/EnableAndSwitchToSpace.png</normaloff>resources/icons/EnableAndSwitchToSpace.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btn_enableSpace">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>resources/icons/EnableSpace.png</normaloff>resources/icons/EnableSpace.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btn_disableSpace">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>resources/icons/DisableSpace.png</normaloff>resources/icons/DisableSpace.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -58,7 +98,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/MatchAndSwitchSpaceToControl.png</normaloff>resources/icons/MatchAndSwitchSpaceToControl.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -72,7 +118,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/MatchSpaceToControl.png</normaloff>resources/icons/MatchSpaceToControl.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -92,7 +144,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/MatchSpaceToSpace.png</normaloff>resources/icons/MatchSpaceToSpace.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -106,7 +164,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/MatchControlToSpaceAndSwitch.png</normaloff>resources/icons/MatchControlToSpaceAndSwitch.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -120,7 +184,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/MatchControlToSpace.png</normaloff>resources/icons/MatchControlToSpace.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -134,7 +204,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/SelectSpaceObject.png</normaloff>resources/icons/SelectSpaceObject.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -148,7 +224,13 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>resources/icons/IconWIP.png</normaloff>resources/icons/IconWIP.png</iconset>
+       <normaloff>resources/icons/ZeroSpaceObject.png</normaloff>resources/icons/ZeroSpaceObject.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
      </property>
     </widget>
    </item>
