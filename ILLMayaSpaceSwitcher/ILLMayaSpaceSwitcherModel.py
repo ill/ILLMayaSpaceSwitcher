@@ -122,22 +122,15 @@ class Space:
                     Util.keyTransforms(self.transformName)
 
     def matchToSpace(self, spaceToMatch, keyEnabled: bool = False):
-        # If this is a rotation space, we're finding the control joint orient
-        # Otherwise we're getting the control relative transform to its parent
-
-        # Find the transform of the control relative to the parent space
+        # Find transform of control relative to space object
+        # Set our transform to be the inverse of that
 
         if self.transformName is not None and spaceToMatch.transformName is not None:
             if self.isRotationSpace():
                 pass
             else:
-                # TODO: if has rotation space, account for the joint orient
-
-                controlWorldTransform = self.getControlWorldTransform()
-                inverseLocalTransform = spaceToMatch.getControlInverseLocalTransform()
-
-                destinationWorldTransform = inverseLocalTransform * controlWorldTransform
-                destinationLocalTransform = destinationWorldTransform * spaceToMatch.getTransformParentInverseWorldTransform()  # TODO: Or is this inverted?
+                destinationWorldTransform = spaceToMatch.getTransformWorldTransform()
+                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()  # TODO: Or is this inverted?
 
                 cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
 
