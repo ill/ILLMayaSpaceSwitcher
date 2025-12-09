@@ -65,6 +65,12 @@ class Space:
     def isRotationSpace(self) -> bool:
         return self.parentSpaceGroup == self.parentSpaceGroup.parentSpaces.rotationSpaces
 
+    def getTransformWorldTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.transformName}.worldMatrix'))
+
+    def getTransformInverseWorldTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.transformName}.worldInverseMatrix'))
+
     def getTransformParentInverseWorldTransform(self):
         return om.MMatrix(cmds.getAttr(f'{self.transformName}.parentInverseMatrix'))
 
@@ -125,10 +131,36 @@ class Space:
             if self.isRotationSpace():
                 pass
             else:
-                inverseLocalTransform = self.getControlRotationSpaceInverseLocalRotation()
+                # TODO: if has rotation space, account for the joint orient
+
+                controlWorldTransform = self.getControlWorldTransform()
+                inverseLocalTransform = spaceToMatch.getControlInverseLocalTransform()
+
+                destinationWorldTransform = inverseLocalTransform * controlWorldTransform
+                destinationLocalTransform = destinationWorldTransform * spaceToMatch.getTransformParentInverseWorldTransform()  # TODO: Or is this inverted?
+
+                cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
+
+                if keyEnabled:
+                    Util.keyTransforms(self.transformName)
 
     def matchControlToSpace(self, keyEnabled: bool = False):
-        pass
+        if self.transformName is not None:
+            # Find relative transform between control and the space, set control transform to that relative transform
+            if self.isRotationSpace():
+                pass
+            else:
+                # TODO: if has rotation space, account for the joint orient
+
+                controlWorldTransform = self.getControlWorldTransform()
+                transformInverseWorldTransform = self.getTransformInverseWorldTransform()
+
+                destinationControlLocalTransform = controlWorldTransform * transformInverseWorldTransform
+
+                cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
+
+                if keyEnabled:
+                    Util.keyTransforms(self.getControlName())
 
     def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         if self.attributeName is not None:
