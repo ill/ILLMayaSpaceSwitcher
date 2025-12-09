@@ -96,7 +96,7 @@ class Space:
 
         self.setAttribute(attributeValue=1, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
-    def matchToControl(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+    def matchToControl(self, keyEnabled: bool = False):
         if self.transformName is not None:
             # Find control relative transform, put us at the inverse of that
             if self.isRotationSpace():
@@ -110,7 +110,10 @@ class Space:
 
                 cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
 
-    def matchToSpace(self, spaceToMatch, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+                if keyEnabled:
+                    Util.keyTransforms(self.transformName)
+
+    def matchToSpace(self, spaceToMatch, keyEnabled: bool = False):
         # If this is a rotation space, we're finding the control joint orient
         # Otherwise we're getting the control relative transform to its parent
 
@@ -122,7 +125,7 @@ class Space:
             else:
                 inverseLocalTransform = self.getControlRotationSpaceInverseLocalRotation()
 
-    def matchControlToSpace(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+    def matchControlToSpace(self, keyEnabled: bool = False):
         pass
 
     def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
@@ -256,11 +259,19 @@ class SpacesIntersectionSpace:
         for space in self.spaces:
             space.setAttribute(attributeValue=attributeValue, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
 
-    def matchToSpace(self, spacesIntersectionToMatch, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+    def matchToControl(self, keyEnabled: bool = False):
+        for space in self.spaces:
+            space.matchToControl(keyEnabled=keyEnabled)
+
+    def matchToSpace(self, spacesIntersectionToMatch, keyEnabled: bool = False):
         for space in self.spaces:
             for spaceToMatch in spacesIntersectionToMatch.spaces:
                 if space.parentSpaceGroup == spaceToMatch.parentSpaceGroup:
-                    space.matchToSpace(spaceToMatch=spaceToMatch, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+                    space.matchToSpace(spaceToMatch=spaceToMatch, keyEnabled=keyEnabled)
+
+    def matchControlToSpace(self, keyEnabled: bool = False):
+        for space in self.spaces:
+            space.matchControlToSpace(keyEnabled=keyEnabled)
 
     def selectTransform(self):
         cmds.select(clear=True)

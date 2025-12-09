@@ -40,3 +40,8 @@ def clearLayout(layout: QtWidgets.QLayout):
         if widget is not None:
             widget.setParent(None)
             widget.deleteLater()
+
+def keyTransforms(node:str):
+    cmds.setKeyframe(node, attribute=['translateX', 'translateY', 'translateZ',
+                                      'rotateX', 'rotateY', 'rotateZ',
+                                      'scaleX', 'scaleY', 'scaleZ'])

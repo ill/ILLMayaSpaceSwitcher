@@ -103,13 +103,12 @@ class IllMayaSpaceWidgetWrapper:
                                 forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchAndSwitchSpaceToControlClicked(self):
-        # TODO: Implement
+        self.space.matchToControl(keyEnabled=self.keyEnabled())
         self.space.switchToSpace(keyEnabled=self.keyEnabled(),
                                  forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchSpaceToControlClicked(self):
-        # TODO: Implement
-        pass
+        self.space.matchToControl(keyEnabled=self.keyEnabled())
 
     def matchSpaceToSpaceClicked(self):
         # Show popup menu of spaces excluding ours
@@ -124,17 +123,15 @@ class IllMayaSpaceWidgetWrapper:
 
         if chosenSpace is not None:
             self.space.matchToSpace(spacesIntersectionToMatch=chosenSpace.data(),
-                                    keyEnabled=self.keyEnabled(),
-                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
+                                    keyEnabled=self.keyEnabled())
 
     def matchAndSwitchControlToSpaceClicked(self):
-        # TODO: Implement
+        self.space.matchControlToSpace(keyEnabled=self.keyEnabled())
         self.space.switchToSpace(keyEnabled=self.keyEnabled(),
                                  forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
 
     def matchControlToSpaceClicked(self):
-        # TODO: Implement
-        pass
+        self.space.matchControlToSpace(keyEnabled=self.keyEnabled())
 
     def selectSpaceObjectClicked(self):
         self.space.selectTransform()
