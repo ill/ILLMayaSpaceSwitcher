@@ -86,6 +86,9 @@ class Space:
     def getControlInverseLocalTransform(self):
         return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.inverseMatrix'))
 
+    def getControlParentInverseWorldTransform(self):
+        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.parentInverseMatrix'))
+
     def getControlRotationSpaceLocalRotation(self):
         if not self.hasRotationSpace():
             return 0.0, 0.0, 0.0
@@ -118,7 +121,7 @@ class Space:
                 inverseLocalTransform = self.getControlInverseLocalTransform()
 
                 destinationWorldTransform = inverseLocalTransform * controlWorldTransform
-                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform() # TODO: Or is this inverted?
+                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()
 
                 cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
 
@@ -137,7 +140,7 @@ class Space:
                 # TODO: if has rotation space, account for the joint orient? Seems to work actually
 
                 destinationWorldTransform = spaceToMatch.getTransformWorldTransform()
-                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()  # TODO: Or is this inverted?
+                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()
 
                 cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
 
@@ -146,11 +149,28 @@ class Space:
 
     def matchControlToSpace(self, keyEnabled: bool = False):
         if self.transformName is not None:
-            # Find relative transform between control and the space, set control transform to that relative transform
             if self.isRotationSpace():
-                # TODO: Implement
-                pass
+                # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
+
+                rotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
+
+                rotationSpaceLocalRotationRadians = om.MTransformationMatrix(rotationSpaceLocalTransform).rotation()
+                rotationSpaceLocalRotation = (om.MAngle(rotationSpaceLocalRotationRadians.x).asDegrees(),
+                                              om.MAngle(rotationSpaceLocalRotationRadians.y).asDegrees(),
+                                              om.MAngle(rotationSpaceLocalRotationRadians.z).asDegrees())
+
+                cmds.rotate(-rotationSpaceLocalRotation[0],
+                            -rotationSpaceLocalRotation[1],
+                            -rotationSpaceLocalRotation[2],
+                            self.getControlName(),
+                            relative=True)
+
+                if keyEnabled:
+                    Util.keyRotation(self.getControlName())
+
             else:
+                # Find relative transform between control and the space, set control transform to that relative transform
+
                 controlRotationSpaceInverseLocalRotation = self.getControlRotationSpaceInverseLocalRotation()
 
                 controlWorldTransform = self.getControlWorldTransform()

@@ -45,3 +45,6 @@ def keyTransforms(node:str):
     cmds.setKeyframe(node, attribute=['translateX', 'translateY', 'translateZ',
                                       'rotateX', 'rotateY', 'rotateZ',
                                       'scaleX', 'scaleY', 'scaleZ'])
+
+def keyRotation(node:str):
+    cmds.setKeyframe(node, attribute=['rotateX', 'rotateY', 'rotateZ'])
