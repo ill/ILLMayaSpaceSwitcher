@@ -183,25 +183,30 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
     def setPressed(self):
         if self.validate():
-            if not cmds.attributeQuery(ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName,
-                                       node=self.selectedControl,
-                                       exists=True):
-                cmds.addAttr(self.selectedControl,
-                             longName=ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName,
-                             dataType='string',
-                             hidden=False)
+            cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Configuration')
+
+            try:
+                if not cmds.attributeQuery(ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName,
+                                           node=self.selectedControl,
+                                           exists=True):
+                    cmds.addAttr(self.selectedControl,
+                                 longName=ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName,
+                                 dataType='string',
+                                 hidden=False)
+                    cmds.setAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}',
+                                 e=True,
+                                 channelBox=False)
+                elif not cmds.getAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}', type=True) == 'string':
+                    QtWidgets.QMessageBox.warning(self, 'Error', f'Attribute "{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}" on "{self.selectedControl}" exists but is not of string type. Delete it to proceed.')
+                    return
+
                 cmds.setAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}',
-                             e=True,
-                             channelBox=False)
-            elif not cmds.getAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}', type=True) == 'string':
-                QtWidgets.QMessageBox.warning(self, 'Error', f'Attribute "{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}" on "{self.selectedControl}" exists but is not of string type. Delete it to proceed.')
-                return
+                             self.te_jsonContents.toPlainText(),
+                             type='string')
 
-            cmds.setAttr(f'{self.selectedControl}.{ILLMayaSpaceSwitcherModel.ILLMayaSpaceSwitcherConfigAttributeName}',
-                         self.te_jsonContents.toPlainText(),
-                         type='string')
-
-            QtWidgets.QMessageBox.information(self, 'Success', 'Validation succeeded and set the Control_Configuration attribute')
+                QtWidgets.QMessageBox.information(self, 'Success', 'Validation succeeded and set the Control_Configuration attribute')
+            finally:
+                cmds.undoInfo(closeChunk=True)
 
     def getSelectedObjectNamePressed(self):
         self.le_selectionName.setText(Util.getSelectedTransform())
