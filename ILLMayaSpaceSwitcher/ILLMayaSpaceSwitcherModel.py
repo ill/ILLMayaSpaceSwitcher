@@ -158,52 +158,56 @@ class Space:
 
     def matchControlToSpace(self, keyEnabled: bool = False):
         if self.transformName is not None:
-            if self.isRotationSpace():
+            if self.hasRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
-
                 currentControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
 
+            if self.isRotationSpace():
                 destinationControlRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
-
-                destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
-
-                rotationSpaceLocalTransformCounterRotateRadians = om.MTransformationMatrix(destinationToCurrentRelativeTransform).rotation()
-                rotationSpaceLocalTransformCounterRotate = (om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.x).asDegrees(),
-                                                         om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.y).asDegrees(),
-                                                         om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.z).asDegrees())
-
-                cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
-                            rotationSpaceLocalTransformCounterRotate[1],
-                            rotationSpaceLocalTransformCounterRotate[2],
-                            self.getControlName(),
-                            relative=True)
-
-                if keyEnabled:
-                    Util.keyRotation(self.getControlName())
-
             else:
-                # Find relative transform between control and the space, set control transform to that relative transform
+                destinationControlLocalTransform = self.getControlWorldTransform() * self.getTransformInverseWorldTransform()
 
-                controlRotationSpaceLocalRotationPreTransform = self.getControlRotationSpaceLocalRotation()
-
-                controlWorldTransform = self.getControlWorldTransform()
-                transformInverseWorldTransform = self.getTransformInverseWorldTransform()
-
-                destinationControlLocalTransform = controlWorldTransform * transformInverseWorldTransform
+                if self.hasRotationSpace():
+                    destinationControlWorldTransform = destinationControlLocalTransform * self.getTransformWorldTransform()
+                    destinationControlRotationSpaceLocalTransform = destinationControlWorldTransform * self.getControlParentInverseWorldTransform()
 
                 # Set the control to the new transform
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
 
-                controlRotationSpaceLocalRotationPostTransform = self.getControlRotationSpaceLocalRotation()
+            if self.hasRotationSpace():
+                destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
 
-                # Counter rotate to account for the rotation space
-                cmds.rotate(controlRotationSpaceLocalRotationPreTransform[0] - controlRotationSpaceLocalRotationPostTransform[0],
-                            controlRotationSpaceLocalRotationPreTransform[1] - controlRotationSpaceLocalRotationPostTransform[1],
-                            controlRotationSpaceLocalRotationPreTransform[2] - controlRotationSpaceLocalRotationPostTransform[2],
-                            self.getControlName(),
-                            relative=True)
+                debugCurrentControlRotationSpaceLocalRotationTransformRotRad = om.MTransformationMatrix(
+                    currentControlRotationSpaceLocalRotationTransform).rotation()
+                debugCurrentControlRotationSpaceLocalRotationTransformRot = (
+                    om.MAngle(debugCurrentControlRotationSpaceLocalRotationTransformRotRad.x).asDegrees(),
+                    om.MAngle(debugCurrentControlRotationSpaceLocalRotationTransformRotRad.y).asDegrees(),
+                    om.MAngle(debugCurrentControlRotationSpaceLocalRotationTransformRotRad.z).asDegrees())
 
-                if keyEnabled:
+                debugDestinationControlRotationSpaceLocalTransformRotRad = om.MTransformationMatrix(
+                    destinationControlRotationSpaceLocalTransform).rotation()
+                debugDestinationControlRotationSpaceLocalTransformRot = (
+                    om.MAngle(debugDestinationControlRotationSpaceLocalTransformRotRad.x).asDegrees(),
+                    om.MAngle(debugDestinationControlRotationSpaceLocalTransformRotRad.y).asDegrees(),
+                    om.MAngle(debugDestinationControlRotationSpaceLocalTransformRotRad.z).asDegrees())
+
+                rotationSpaceLocalTransformCounterRotateRadians = om.MTransformationMatrix(
+                    destinationToCurrentRelativeTransform).rotation()
+                rotationSpaceLocalTransformCounterRotate = (
+                    om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.x).asDegrees(),
+                    om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.y).asDegrees(),
+                    om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.z).asDegrees())
+
+                # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
+                #             rotationSpaceLocalTransformCounterRotate[1],
+                #             rotationSpaceLocalTransformCounterRotate[2],
+                #             self.getControlName(),
+                #             relative=True)
+
+            if keyEnabled:
+                if self.isRotationSpace():
+                    Util.keyRotation(self.getControlName())
+                else:
                     Util.keyTransforms(self.getControlName())
 
     def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
