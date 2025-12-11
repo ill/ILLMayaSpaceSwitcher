@@ -61,39 +61,44 @@ def getOmRotationOrder(node:str):
         om.MEulerRotation.kZYX,
     ][cmds.getAttr(f'{node}.rotateOrder')]
 
-def force_eval_joint_orient(joint):
-    sel = om.MSelectionList()
-    sel.add(joint)
-    mobj = sel.getDependNode(0)
-    fn = om.MFnDependencyNode(mobj)
-
-    # jointOrient is compound, grab a child plug
-    plug_x = fn.findPlug("jointOrientX", False)
-
-    # This should trigger evaluation of the upstream network
-    _ = plug_x.asDouble()
-
-    return cmds.getAttr(joint + ".jointOrient")[0]
-
-
-def forceUpdateByMultiFrameJump(jumpCount=3):
-    """
-    Forces a full Dependency Graph evaluation and UI refresh by
-    advancing the time by a specified number of frames and returning.
-    """
-    # 1. Store the current time
-    currentTime = cmds.currentTime(query=True)
-    tempTime = currentTime
-
-    # 2. Loop through several frame changes
-    for _ in range(jumpCount):
-        tempTime += 1  # Advance by 1 frame
-        cmds.currentTime(tempTime, edit=True, update=True)
-        cmds.refresh(force=True)
-        # Ensure idle events are processed during each jump
-        maya.utils.processIdleEvents()
-
-    # 3. Jump back to the original frame
-    cmds.currentTime(currentTime, edit=True, update=True)
-    cmds.refresh(force=True)
-    maya.utils.processIdleEvents()
+# def force_eval_joint_orient(joint):
+#     sel = om.MSelectionList()
+#     sel.add(joint)
+#     mobj = sel.getDependNode(0)
+#     fn = om.MFnDependencyNode(mobj)
+#
+#     plug_thing = fn.findPlug("parentInverseMatrix", False)
+#     #plug_thing = plug_thing.array(0)
+#
+#     # jointOrient is compound, grab a child plug
+#     plug_x = fn.findPlug("jointOrientX", False)
+#
+#     # This should trigger evaluation of the upstream network
+#     _ = plug_x.asDouble()
+#
+#
+#
+#     return cmds.getAttr(joint + ".jointOrient")[0]
+#
+#
+# def forceUpdateByMultiFrameJump(jumpCount=3):
+#     """
+#     Forces a full Dependency Graph evaluation and UI refresh by
+#     advancing the time by a specified number of frames and returning.
+#     """
+#     # 1. Store the current time
+#     currentTime = cmds.currentTime(query=True)
+#     tempTime = currentTime
+#
+#     # 2. Loop through several frame changes
+#     for _ in range(jumpCount):
+#         tempTime += 1  # Advance by 1 frame
+#         cmds.currentTime(tempTime, edit=True, update=True)
+#         cmds.refresh(force=True)
+#         # Ensure idle events are processed during each jump
+#         maya.utils.processIdleEvents()
+#
+#     # 3. Jump back to the original frame
+#     cmds.currentTime(currentTime, edit=True, update=True)
+#     cmds.refresh(force=True)
+#     maya.utils.processIdleEvents()

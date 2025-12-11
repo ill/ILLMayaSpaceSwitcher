@@ -58,16 +58,19 @@ class Space:
                    transformName=transformName)
 
     def getControlName(self) -> str:
-        return self.parentSpaceGroup.parentSpaces.controlName
+        return self.parentSpaceGroup.getControlName()
 
     def getSpaceIndex(self) -> int:
-        return self.parentSpaceGroup.spaces.index(self)
+        return self.parentSpaceGroup.getSpaceIndex(self)
 
     def isRotationSpace(self) -> bool:
-        return self.parentSpaceGroup == self.parentSpaceGroup.parentSpaces.rotationSpaces
+        return self.parentSpaceGroup.isRotationSpace()
 
-    def hasRotationSpace(self) -> bool:
-        return self.parentSpaceGroup.parentSpaces.rotationSpaces is not None
+    def hasSpaces(self) -> bool:
+        return self.parentSpaceGroup.hasSpaces()
+
+    def hasRotationSpaces(self) -> bool:
+        return self.parentSpaceGroup.hasRotationSpaces()
 
     def getTransformWorldTransform(self):
         return om.MMatrix(cmds.getAttr(f'{self.transformName}.worldMatrix'))
@@ -79,35 +82,25 @@ class Space:
         return om.MMatrix(cmds.getAttr(f'{self.transformName}.parentInverseMatrix'))
 
     def getControlWorldTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.worldMatrix'))
+        return self.parentSpaceGroup.getControlWorldTransform()
 
     def getControlLocalTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.matrix'))
+        return self.parentSpaceGroup.getControlLocalTransform()
 
     def getControlInverseLocalTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.inverseMatrix'))
+        return self.parentSpaceGroup.getControlInverseLocalTransform()
 
     def getControlParentInverseWorldTransform(self):
-        return om.MMatrix(cmds.getAttr(f'{self.getControlName()}.parentInverseMatrix'))
+        return self.parentSpaceGroup.getControlParentInverseWorldTransform()
 
     def getControlRotationSpaceLocalRotation(self):
-        if not self.hasRotationSpace():
-            return 0.0, 0.0, 0.0
-
-        return cmds.getAttr(f'{self.getControlName()}.jointOrient')[0]
+        return self.parentSpaceGroup.getControlRotationSpaceLocalRotation()
 
     def getControlRotationSpaceInverseLocalRotation(self):
-        jointOrient = self.getControlRotationSpaceLocalRotation()
-
-        return -jointOrient[0], -jointOrient[1], -jointOrient[2]
+        return self.parentSpaceGroup.getControlRotationSpaceInverseLocalRotation()
 
     def getControlRotationSpaceLocalRotationTransform(self):
-        controlRotationSpaceLocalRotation = self.getControlRotationSpaceLocalRotation()
-
-        return om.MEulerRotation(math.radians(controlRotationSpaceLocalRotation[0]),
-                                 math.radians(controlRotationSpaceLocalRotation[1]),
-                                 math.radians(controlRotationSpaceLocalRotation[2]),
-                                 Util.getOmRotationOrder(self.getControlName())).asMatrix()
+        return self.parentSpaceGroup.getControlRotationSpaceLocalRotationTransform()
 
     # Switches to this space
     def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
@@ -158,7 +151,7 @@ class Space:
 
     def matchControlToSpace(self, keyEnabled: bool = False):
         if self.transformName is not None:
-            if self.hasRotationSpace():
+            if self.hasRotationSpaces():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
                 # This is the rotation space joint orient now
                 currentControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
@@ -195,18 +188,18 @@ class Space:
 
 
 
-                if self.hasRotationSpace():
+                if self.hasRotationSpaces():
                     # Make sure the joint orient is dirtied so we get the new value here, or we just get the old value
                     #cmds.refresh()
                     # cmds.evaluationManager(mode="off")
                     # cmds.evaluationManager(mode="parallel")
 
-                    joAfter = Util.force_eval_joint_orient(self.getControlName())
-                    joAfter = self.getControlRotationSpaceLocalRotation()
+                    # joAfter = Util.force_eval_joint_orient(self.getControlName())
+                    # joAfter = self.getControlRotationSpaceLocalRotation()
 
                     destinationControlRotationSpaceLocalTransform = self.getControlRotationSpaceLocalRotationTransform()
 
-            if self.hasRotationSpace():
+            if self.hasRotationSpaces():
                 destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
 
                 debugCurrentControlRotationSpaceLocalRotationTransformRotRad = om.MTransformationMatrix(
@@ -303,6 +296,42 @@ class SpaceGroup:
                    spaces=[Space.fromJsonData(controlName=controlName, jsonData=spaceDefinitionJsonData)
                            for spaceDefinitionJsonData in definitionsJsonData] if definitionsJsonData is not None else None)
 
+    def getControlName(self) -> str:
+        return self.parentSpaces.controlName
+
+    def getSpaceIndex(self, space: Space) -> int:
+        return self.spaces.index(space)
+
+    def isRotationSpace(self) -> bool:
+        return self == self.parentSpaces.rotationSpaces
+
+    def hasSpaces(self) -> bool:
+        return self.parentSpaces.hasSpaces()
+
+    def hasRotationSpaces(self) -> bool:
+        return self.parentSpaces.hasRotationSpaces()
+
+    def getControlWorldTransform(self):
+        return self.parentSpaces.getControlWorldTransform()
+
+    def getControlLocalTransform(self):
+        return self.parentSpaces.getControlLocalTransform()
+
+    def getControlInverseLocalTransform(self):
+        return self.parentSpaces.getControlInverseLocalTransform()
+
+    def getControlParentInverseWorldTransform(self):
+        return self.parentSpaces.getControlParentInverseWorldTransform()
+
+    def getControlRotationSpaceLocalRotation(self):
+        return self.parentSpaces.getControlRotationSpaceLocalRotation()
+
+    def getControlRotationSpaceInverseLocalRotation(self):
+        return self.parentSpaces.getControlRotationSpaceInverseLocalRotation()
+
+    def getControlRotationSpaceLocalRotationTransform(self):
+        return self.parentSpaces.getControlRotationSpaceLocalRotationTransform()
+
 # Represents the definition of a single control's collection of spaces
 class Spaces:
     def __init__(self,
@@ -358,6 +387,60 @@ class Spaces:
         return cls(controlName=controlName,
                    spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
                    rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
+
+    def hasSpaces(self) -> bool:
+        return self.spaces is not None
+    def hasRotationSpaces(self) -> bool:
+        return self.rotationSpaces is not None
+
+    def getControlWorldTransform(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        return om.MMatrix(cmds.getAttr(f'{self.controlName}.worldMatrix'))
+
+    def getControlLocalTransform(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        return om.MMatrix(cmds.getAttr(f'{self.controlName}.matrix'))
+
+    def getControlInverseLocalTransform(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        return om.MMatrix(cmds.getAttr(f'{self.controlName}.inverseMatrix'))
+
+    def getControlParentInverseWorldTransform(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        return om.MMatrix(cmds.getAttr(f'{self.controlName}.parentInverseMatrix'))
+
+    def getControlRotationSpaceLocalRotation(self):
+        if not self.hasRotationSpaces():
+            return 0.0, 0.0, 0.0
+
+        return cmds.getAttr(f'{self.controlName}.jointOrient')[0]
+
+    def getControlRotationSpaceInverseLocalRotation(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        jointOrient = self.getControlRotationSpaceLocalRotation()
+
+        return -jointOrient[0], -jointOrient[1], -jointOrient[2]
+
+    def getControlRotationSpaceLocalRotationTransform(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        controlRotationSpaceLocalRotation = self.getControlRotationSpaceLocalRotation()
+
+        return om.MEulerRotation(math.radians(controlRotationSpaceLocalRotation[0]),
+                                 math.radians(controlRotationSpaceLocalRotation[1]),
+                                 math.radians(controlRotationSpaceLocalRotation[2]),
+                                 Util.getOmRotationOrder(self.controlName)).asMatrix()
 
 class SpacesIntersectionSpace:
     def __init__(self, parentSpacesIntersectionGroup, name: str = '', spaces:list[Space] = None):
