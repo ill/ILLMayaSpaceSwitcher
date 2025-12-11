@@ -160,19 +160,51 @@ class Space:
         if self.transformName is not None:
             if self.hasRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
+                # This is the rotation space joint orient now
                 currentControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
 
             if self.isRotationSpace():
+                # This is the rotation space joint orient that it would be if we switched to this space
                 destinationControlRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
             else:
+                # This is the local transform of the control that it would be if we switched to this space
                 destinationControlLocalTransform = self.getControlWorldTransform() * self.getTransformInverseWorldTransform()
 
-                if self.hasRotationSpace():
-                    destinationControlWorldTransform = destinationControlLocalTransform * self.getTransformWorldTransform()
-                    destinationControlRotationSpaceLocalTransform = destinationControlWorldTransform * self.getControlParentInverseWorldTransform()
+                # if self.hasRotationSpace():
+                #     # This is the world transform of the control that it would be if we switched to this space and applied destinationControlLocalTransform
+                #     destinationControlWorldTransform = destinationControlLocalTransform * self.getTransformWorldTransform()
+                #
+                #     # This is the rotation space joint orient that it would be if we switched to this space
+                #     destinationControlRotationSpaceLocalTransform = destinationControlWorldTransform * self.getControlParentInverseWorldTransform()
+
+                joBefore = self.getControlRotationSpaceLocalRotation()
+
+                original_mode = cmds.evaluationManager(query=True, mode=True)[0]
+                cmds.evaluationManager(mode="serial")
 
                 # Set the control to the new transform
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
+
+                Util.forceUpdateByMultiFrameJump()
+
+                cmds.evaluationManager(invalidate=True)
+                cmds.refresh()
+
+                # Switch back to the original mode (usually 'parallel' or 'dg')
+                cmds.evaluationManager(mode=original_mode)
+
+
+
+                if self.hasRotationSpace():
+                    # Make sure the joint orient is dirtied so we get the new value here, or we just get the old value
+                    #cmds.refresh()
+                    # cmds.evaluationManager(mode="off")
+                    # cmds.evaluationManager(mode="parallel")
+
+                    joAfter = Util.force_eval_joint_orient(self.getControlName())
+                    joAfter = self.getControlRotationSpaceLocalRotation()
+
+                    destinationControlRotationSpaceLocalTransform = self.getControlRotationSpaceLocalRotationTransform()
 
             if self.hasRotationSpace():
                 destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
@@ -198,11 +230,11 @@ class Space:
                     om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.y).asDegrees(),
                     om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.z).asDegrees())
 
-                # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
-                #             rotationSpaceLocalTransformCounterRotate[1],
-                #             rotationSpaceLocalTransformCounterRotate[2],
-                #             self.getControlName(),
-                #             relative=True)
+                cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
+                            rotationSpaceLocalTransformCounterRotate[1],
+                            rotationSpaceLocalTransformCounterRotate[2],
+                            self.getControlName(),
+                            relative=True)
 
             if keyEnabled:
                 if self.isRotationSpace():
