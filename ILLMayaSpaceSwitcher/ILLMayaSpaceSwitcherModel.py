@@ -150,7 +150,8 @@ class Space:
                     Util.keyTransforms(self.transformName)
 
     def matchControlToSpace(self, keyEnabled: bool = False):
-        if self.transformName is not None:
+        # The base rotation space should be allowed to have this called on it by pulling from the base space transform
+        if self.transformName is not None or (self.isRotationSpace() and self.getSpaceIndex() == 0):
             if self.hasRotationSpaces():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
                 # This is the rotation space joint orient now
@@ -158,7 +159,8 @@ class Space:
 
             if self.isRotationSpace():
                 # This is the rotation space joint orient that it would be if we switched to this space
-                destinationControlRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform()
+                # If we're switching to the base rotation space there's no transform name, so the destination rotation space will be nothing
+                destinationControlRotationSpaceLocalTransform = self.getTransformWorldTransform() * self.getControlParentInverseWorldTransform() if self.transformName else om.MMatrix.kIdentity
             else:
                 # This is the local transform of the control that it would be if we switched to this space
                 destinationControlLocalTransform = self.getControlWorldTransform() * self.getTransformInverseWorldTransform()
@@ -174,7 +176,7 @@ class Space:
 
                     destinationControlRotationSpaceLocalTransform = self.getControlRotationSpaceLocalRotationTransform()
 
-                    # Restore it back to normal now
+                    # Restore it back to normal now, in case we're not actually switching to this space after
                     self.parentSpaceGroup.setAttributes(tempAttributeStates)
 
             if self.hasRotationSpaces():
@@ -393,6 +395,12 @@ class Spaces:
             raise NameError(f'No control name on space.')
 
         return om.MMatrix(cmds.getAttr(f'{self.controlName}.inverseMatrix'))
+
+    def getControlParentWorldTransform(self):
+        if self.controlName is None:
+            raise NameError(f'No control name on space.')
+
+        return om.MMatrix(cmds.getAttr(f'{self.controlName}.parentMatrix'))
 
     def getControlParentInverseWorldTransform(self):
         if self.controlName is None:
