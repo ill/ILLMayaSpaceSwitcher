@@ -172,19 +172,19 @@ class Space:
 
                 joBefore = self.getControlRotationSpaceLocalRotation()
 
-                original_mode = cmds.evaluationManager(query=True, mode=True)[0]
-                cmds.evaluationManager(mode="serial")
+                # original_mode = cmds.evaluationManager(query=True, mode=True)[0]
+                # cmds.evaluationManager(mode="serial")
 
                 # Set the control to the new transform
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
 
-                Util.forceUpdateByMultiFrameJump()
-
-                cmds.evaluationManager(invalidate=True)
-                cmds.refresh()
-
-                # Switch back to the original mode (usually 'parallel' or 'dg')
-                cmds.evaluationManager(mode=original_mode)
+                # Util.forceUpdateByMultiFrameJump()
+                #
+                # cmds.evaluationManager(invalidate=True)
+                # cmds.refresh()
+                #
+                # # Switch back to the original mode (usually 'parallel' or 'dg')
+                # cmds.evaluationManager(mode=original_mode)
 
 
 
@@ -195,9 +195,22 @@ class Space:
                     # cmds.evaluationManager(mode="parallel")
 
                     # joAfter = Util.force_eval_joint_orient(self.getControlName())
-                    # joAfter = self.getControlRotationSpaceLocalRotation()
+
+                    tempAttributeStates = self.parentSpaceGroup.getAttributes()
+
+                    # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work
+                    self.switchToSpace()
+
+                    joAfter = self.getControlRotationSpaceLocalRotation()
+                    print(joAfter)
 
                     destinationControlRotationSpaceLocalTransform = self.getControlRotationSpaceLocalRotationTransform()
+
+                    # Restore it back to normal now
+                    self.parentSpaceGroup.setAttributes(tempAttributeStates)
+
+                    joAfter = self.getControlRotationSpaceLocalRotation()
+                    print(joAfter)
 
             if self.hasRotationSpaces():
                 destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
@@ -235,11 +248,18 @@ class Space:
                 else:
                     Util.keyTransforms(self.getControlName())
 
+    def getAttribute(self) -> float:
+        if self.attributeName is None:
+            return 0.0
+
+        return cmds.getAttr(f'{self.getControlName()}.{self.attributeName}')
+
+
     def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
         if self.attributeName is not None:
             controlName = self.getControlName()
 
-            if forceKeyIfAlreadyAtValue or cmds.getAttr(f'{controlName}.{self.attributeName}') != attributeValue:
+            if forceKeyIfAlreadyAtValue or self.getAttribute() != attributeValue:
                 cmds.setAttr(f'{controlName}.{self.attributeName}', attributeValue)
 
                 if keyEnabled:
@@ -332,6 +352,16 @@ class SpaceGroup:
     def getControlRotationSpaceLocalRotationTransform(self):
         return self.parentSpaces.getControlRotationSpaceLocalRotationTransform()
 
+    # Gets the current state of all the attributes in the space group now
+    def getAttributes(self) -> list[float]:
+        return [space.getAttribute() for space in self.spaces]
+
+    # Restores the state of all the attributes in the space group to these values
+    def setAttributes(self, attributes:list[float]) :
+        for index, attribute in enumerate(attributes):
+            self.spaces[index].setAttribute(attribute)
+
+
 # Represents the definition of a single control's collection of spaces
 class Spaces:
     def __init__(self,
@@ -390,6 +420,7 @@ class Spaces:
 
     def hasSpaces(self) -> bool:
         return self.spaces is not None
+
     def hasRotationSpaces(self) -> bool:
         return self.rotationSpaces is not None
 
