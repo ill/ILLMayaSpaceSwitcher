@@ -112,23 +112,66 @@ class Space:
 
     def matchToControl(self, keyEnabled: bool = False):
         if self.transformName is not None:
-            # Find control relative transform, put us at the inverse of that
+            # TODO: For rotation space, the joint orient should be the same in the end
+            # Find what the joint orient would be if we were to switch to this space
+            # Counter rotate by that amount?
+
             if self.isRotationSpace():
-                # TODO: Implement
-                pass
-            else:
-                # TODO: if has rotation space, account for the joint orient? Seems to work actually
+                # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
+                # This is the rotation space joint orient now
+                preMoveControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
 
-                controlWorldTransform = self.getControlWorldTransform()
-                inverseLocalTransform = self.getControlInverseLocalTransform()
+            # Find control relative transform, put us at the inverse of that
+            controlWorldTransform = self.getControlWorldTransform()
+            inverseLocalTransform = self.getControlInverseLocalTransform()
 
-                destinationWorldTransform = inverseLocalTransform * controlWorldTransform
-                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()
+            destinationWorldTransform = inverseLocalTransform * controlWorldTransform
+            destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()
 
-                cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
+            cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
 
-                if keyEnabled:
-                    Util.keyTransforms(self.transformName)
+            if self.isRotationSpace():
+                tempAttributeStates = self.parentSpaceGroup.getAttributes()
+
+                # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work for getting what would be the joint orient
+                self.switchToSpace()
+
+                # counter rotate rotation on the transform to account for the change in joint orient
+                postMoveControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
+
+                # Restore it back to normal now, in case we're not actually switching to this space after
+                self.parentSpaceGroup.setAttributes(tempAttributeStates)
+
+                # Counter rotate by the delta in the joint orient
+                destinationToCurrentRelativeTransform = preMoveControlRotationSpaceLocalRotationTransform * postMoveControlRotationSpaceLocalRotationTransform.inverse()
+
+                thing = controlWorldTransform * destinationWorldTransform.inverse()
+
+                pre = Util.getOmTransformRotation(preMoveControlRotationSpaceLocalRotationTransform)
+                post = Util.getOmTransformRotation(postMoveControlRotationSpaceLocalRotationTransform)
+
+                print(pre)
+                print(post)
+
+                rotationSpaceLocalTransformCounterRotate = Util.getOmTransformRotation(destinationToCurrentRelativeTransform)
+                thing = Util.getOmTransformRotation(thing)
+
+                print(thing)
+
+                # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0] - thing[0],
+                #             rotationSpaceLocalTransformCounterRotate[1] - thing[1],
+                #             rotationSpaceLocalTransformCounterRotate[2] - thing[2],
+                #             self.transformName,
+                #             relative=True)
+
+                cmds.rotate(thing[0],
+                            thing[1],
+                            thing[2],
+                            self.transformName,
+                            relative=True)
+
+            if keyEnabled:
+                Util.keyTransforms(self.transformName)
 
     def matchToSpace(self, spaceToMatch, keyEnabled: bool = False):
         # Find transform of control relative to space object
@@ -183,12 +226,7 @@ class Space:
                 # Counter rotate by the delta in the joint orient
                 destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
 
-                rotationSpaceLocalTransformCounterRotateRadians = om.MTransformationMatrix(
-                    destinationToCurrentRelativeTransform).rotation()
-                rotationSpaceLocalTransformCounterRotate = (
-                    om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.x).asDegrees(),
-                    om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.y).asDegrees(),
-                    om.MAngle(rotationSpaceLocalTransformCounterRotateRadians.z).asDegrees())
+                rotationSpaceLocalTransformCounterRotate = Util.getOmTransformRotation(destinationToCurrentRelativeTransform)
 
                 cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
                             rotationSpaceLocalTransformCounterRotate[1],

@@ -60,3 +60,9 @@ def getOmRotationOrder(node:str):
         om.MEulerRotation.kYXZ,
         om.MEulerRotation.kZYX,
     ][cmds.getAttr(f'{node}.rotateOrder')]
+
+def getOmTransformRotation(matrix:om.MMatrix):
+    radians = om.MTransformationMatrix(matrix).rotation()
+    return (om.MAngle(radians.x).asDegrees(),
+            om.MAngle(radians.y).asDegrees(),
+            om.MAngle(radians.z).asDegrees())
