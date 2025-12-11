@@ -163,71 +163,23 @@ class Space:
                 # This is the local transform of the control that it would be if we switched to this space
                 destinationControlLocalTransform = self.getControlWorldTransform() * self.getTransformInverseWorldTransform()
 
-                # if self.hasRotationSpace():
-                #     # This is the world transform of the control that it would be if we switched to this space and applied destinationControlLocalTransform
-                #     destinationControlWorldTransform = destinationControlLocalTransform * self.getTransformWorldTransform()
-                #
-                #     # This is the rotation space joint orient that it would be if we switched to this space
-                #     destinationControlRotationSpaceLocalTransform = destinationControlWorldTransform * self.getControlParentInverseWorldTransform()
-
-                joBefore = self.getControlRotationSpaceLocalRotation()
-
-                # original_mode = cmds.evaluationManager(query=True, mode=True)[0]
-                # cmds.evaluationManager(mode="serial")
-
                 # Set the control to the new transform
                 cmds.xform(self.getControlName(), matrix=list(destinationControlLocalTransform))
 
-                # Util.forceUpdateByMultiFrameJump()
-                #
-                # cmds.evaluationManager(invalidate=True)
-                # cmds.refresh()
-                #
-                # # Switch back to the original mode (usually 'parallel' or 'dg')
-                # cmds.evaluationManager(mode=original_mode)
-
-
-
                 if self.hasRotationSpaces():
-                    # Make sure the joint orient is dirtied so we get the new value here, or we just get the old value
-                    #cmds.refresh()
-                    # cmds.evaluationManager(mode="off")
-                    # cmds.evaluationManager(mode="parallel")
-
-                    # joAfter = Util.force_eval_joint_orient(self.getControlName())
-
                     tempAttributeStates = self.parentSpaceGroup.getAttributes()
 
-                    # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work
+                    # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work for getting what would be the joint orient
                     self.switchToSpace()
-
-                    joAfter = self.getControlRotationSpaceLocalRotation()
-                    print(joAfter)
 
                     destinationControlRotationSpaceLocalTransform = self.getControlRotationSpaceLocalRotationTransform()
 
                     # Restore it back to normal now
                     self.parentSpaceGroup.setAttributes(tempAttributeStates)
 
-                    joAfter = self.getControlRotationSpaceLocalRotation()
-                    print(joAfter)
-
             if self.hasRotationSpaces():
+                # Counter rotate by the delta in the joint orient
                 destinationToCurrentRelativeTransform = currentControlRotationSpaceLocalRotationTransform * destinationControlRotationSpaceLocalTransform.inverse()
-
-                debugCurrentControlRotationSpaceLocalRotationTransformRotRad = om.MTransformationMatrix(
-                    currentControlRotationSpaceLocalRotationTransform).rotation()
-                debugCurrentControlRotationSpaceLocalRotationTransformRot = (
-                    om.MAngle(debugCurrentControlRotationSpaceLocalRotationTransformRotRad.x).asDegrees(),
-                    om.MAngle(debugCurrentControlRotationSpaceLocalRotationTransformRotRad.y).asDegrees(),
-                    om.MAngle(debugCurrentControlRotationSpaceLocalRotationTransformRotRad.z).asDegrees())
-
-                debugDestinationControlRotationSpaceLocalTransformRotRad = om.MTransformationMatrix(
-                    destinationControlRotationSpaceLocalTransform).rotation()
-                debugDestinationControlRotationSpaceLocalTransformRot = (
-                    om.MAngle(debugDestinationControlRotationSpaceLocalTransformRotRad.x).asDegrees(),
-                    om.MAngle(debugDestinationControlRotationSpaceLocalTransformRotRad.y).asDegrees(),
-                    om.MAngle(debugDestinationControlRotationSpaceLocalTransformRotRad.z).asDegrees())
 
                 rotationSpaceLocalTransformCounterRotateRadians = om.MTransformationMatrix(
                     destinationToCurrentRelativeTransform).rotation()
