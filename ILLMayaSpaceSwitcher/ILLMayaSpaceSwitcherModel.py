@@ -115,82 +115,20 @@ class Space:
 
     def matchToControl(self, keyEnabled: bool = False):
         if self.transformName is not None:
-            # TODO: For rotation space, the joint orient should be the same in the end
-            # Find what the joint orient would be if we were to switch to this space
-            # Counter rotate by that amount?
-
-
-            # Find original joint orient
-            # Find control relative transform
-            # Find relative transform between those two X
-
-            # Transform the locator
-
-            # Set its rotation to the value such that its rotation is offset by the relative transform X relative to the control world transform rotation
-
-            if self.isRotationSpace():
-                # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
-                # This is the rotation space joint orient now
-                #preMoveControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
-
-                preMoveControlWorldTransform = self.getControlWorldTransform()
-
             # Find control relative transform, put us at the inverse of that
             controlWorldTransform = self.getControlWorldTransform()
-            inverseLocalTransform = self.getControlInverseLocalTransform()
+            controlInverseLocalTransform = self.getControlInverseLocalTransform()
 
-            destinationWorldTransform = inverseLocalTransform * controlWorldTransform
-            destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()
-
-            cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
+            destinationTransformWorldTransform = controlInverseLocalTransform * controlWorldTransform
 
             if self.isRotationSpace():
-                # Apply only the rotation part of preMoveControlWorldTransform in absolute world space
-                tempAttributeStates = self.parentSpaceGroup.getAttributes()
+                # If we're a rotation space also offset by the current joint orient
+                destinationTransformWorldTransform = self.getControlRotationSpaceLocalRotationTransform() * destinationTransformWorldTransform
+                pass
 
-                # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work for getting what would be the joint orient
-                self.switchToSpace()
+            destinationTransformLocalTransform = destinationTransformWorldTransform * self.getTransformParentInverseWorldTransform()
 
-                # counter rotate rotation on the transform to account for the change in joint orient
-                postMoveControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
-
-                # Restore it back to normal now, in case we're not actually switching to this space after
-                self.parentSpaceGroup.setAttributes(tempAttributeStates)
-
-                # Counter rotate by the delta in the joint orient
-                destinationToCurrentRelativeTransform = preMoveControlRotationSpaceLocalRotationTransform * postMoveControlRotationSpaceLocalRotationTransform.inverse()
-
-                thing = controlWorldTransform * destinationWorldTransform.inverse()
-
-                pre = Util.getOmTransformRotation(preMoveControlRotationSpaceLocalRotationTransform)
-                post = Util.getOmTransformRotation(postMoveControlRotationSpaceLocalRotationTransform)
-
-                print(pre)
-                print(post)
-
-                rotationSpaceLocalTransformCounterRotate = Util.getOmTransformRotation(destinationToCurrentRelativeTransform)
-                thing = Util.getOmTransformRotation(thing)
-
-                print(rotationSpaceLocalTransformCounterRotate)
-                #print(thing)
-
-                # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
-                #             rotationSpaceLocalTransformCounterRotate[1],
-                #             rotationSpaceLocalTransformCounterRotate[2],
-                #             self.transformName,
-                #             relative=True)
-
-                # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0] - thing[0],
-                #             rotationSpaceLocalTransformCounterRotate[1] - thing[1],
-                #             rotationSpaceLocalTransformCounterRotate[2] - thing[2],
-                #             self.transformName,
-                #             relative=True)
-
-                # cmds.rotate(thing[0],
-                #             thing[1],
-                #             thing[2],
-                #             self.transformName,
-                #             relative=True)
+            cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
             if keyEnabled:
                 Util.keyTransforms(self.transformName)
