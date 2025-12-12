@@ -116,15 +116,11 @@ class Space:
     def matchToControl(self, keyEnabled: bool = False):
         if self.transformName is not None:
             # Find control relative transform, put us at the inverse of that
-            controlWorldTransform = self.getControlWorldTransform()
-            controlInverseLocalTransform = self.getControlInverseLocalTransform()
-
-            destinationTransformWorldTransform = controlInverseLocalTransform * controlWorldTransform
+            destinationTransformWorldTransform = self.getControlInverseLocalTransform() * self.getControlWorldTransform()
 
             if self.isRotationSpace():
                 # If we're a rotation space also offset by the current joint orient
                 destinationTransformWorldTransform = self.getControlRotationSpaceLocalRotationTransform() * destinationTransformWorldTransform
-                pass
 
             destinationTransformLocalTransform = destinationTransformWorldTransform * self.getTransformParentInverseWorldTransform()
 
@@ -138,19 +134,18 @@ class Space:
         # Set our transform to be the inverse of that
 
         if self.transformName is not None and spaceToMatch.transformName is not None:
-            if self.isRotationSpace():
-                # TODO: Implement
-                pass
-            else:
-                # TODO: if has rotation space, account for the joint orient? Seems to work actually
+            destinationTransformWorldTransform = spaceToMatch.getTransformWorldTransform()
 
-                destinationWorldTransform = spaceToMatch.getTransformWorldTransform()
-                destinationLocalTransform = destinationWorldTransform * self.getTransformParentInverseWorldTransform()
+            # if self.isRotationSpace():
+            #     # If we're a rotation space also offset by the current joint orient
+            #     destinationTransformWorldTransform = spaceToMatch.getControlRotationSpaceLocalRotationTransform() * destinationTransformWorldTransform
 
-                cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
+            destinationTransformLocalTransform = destinationTransformWorldTransform * self.getTransformParentInverseWorldTransform()
 
-                if keyEnabled:
-                    Util.keyTransforms(self.transformName)
+            cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
+
+            if keyEnabled:
+                Util.keyTransforms(self.transformName)
 
     def matchControlToSpace(self, keyEnabled: bool = False):
         # The base rotation space should be allowed to have this called on it by pulling from the base space transform
