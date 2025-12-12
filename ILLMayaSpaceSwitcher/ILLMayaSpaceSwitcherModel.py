@@ -130,17 +130,9 @@ class Space:
                 Util.keyTransforms(self.transformName)
 
     def matchToSpace(self, spaceToMatch, keyEnabled: bool = False):
-        # Find transform of control relative to space object
-        # Set our transform to be the inverse of that
-
         if self.transformName is not None and spaceToMatch.transformName is not None:
-            destinationTransformWorldTransform = spaceToMatch.getTransformWorldTransform()
-
-            # if self.isRotationSpace():
-            #     # If we're a rotation space also offset by the current joint orient
-            #     destinationTransformWorldTransform = spaceToMatch.getControlRotationSpaceLocalRotationTransform() * destinationTransformWorldTransform
-
-            destinationTransformLocalTransform = destinationTransformWorldTransform * self.getTransformParentInverseWorldTransform()
+            # Simply copy the transform of the space we're matching
+            destinationTransformLocalTransform = spaceToMatch.getTransformWorldTransform() * self.getTransformParentInverseWorldTransform()
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
