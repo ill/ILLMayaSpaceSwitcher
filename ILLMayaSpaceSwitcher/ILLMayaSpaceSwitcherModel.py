@@ -90,6 +90,9 @@ class Space:
     def getControlInverseLocalTransform(self):
         return self.parentSpaceGroup.getControlInverseLocalTransform()
 
+    def getControlParentWorldTransform(self):
+        return self.parentSpaceGroup.getControlParentWorldTransform()
+
     def getControlParentInverseWorldTransform(self):
         return self.parentSpaceGroup.getControlParentInverseWorldTransform()
 
@@ -116,10 +119,21 @@ class Space:
             # Find what the joint orient would be if we were to switch to this space
             # Counter rotate by that amount?
 
+
+            # Find original joint orient
+            # Find control relative transform
+            # Find relative transform between those two X
+
+            # Transform the locator
+
+            # Set its rotation to the value such that its rotation is offset by the relative transform X relative to the control world transform rotation
+
             if self.isRotationSpace():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
                 # This is the rotation space joint orient now
-                preMoveControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
+                #preMoveControlRotationSpaceLocalRotationTransform = self.getControlRotationSpaceLocalRotationTransform()
+
+                preMoveControlWorldTransform = self.getControlWorldTransform()
 
             # Find control relative transform, put us at the inverse of that
             controlWorldTransform = self.getControlWorldTransform()
@@ -131,6 +145,7 @@ class Space:
             cmds.xform(self.transformName, matrix=list(destinationLocalTransform))
 
             if self.isRotationSpace():
+                # Apply only the rotation part of preMoveControlWorldTransform in absolute world space
                 tempAttributeStates = self.parentSpaceGroup.getAttributes()
 
                 # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work for getting what would be the joint orient
@@ -156,7 +171,14 @@ class Space:
                 rotationSpaceLocalTransformCounterRotate = Util.getOmTransformRotation(destinationToCurrentRelativeTransform)
                 thing = Util.getOmTransformRotation(thing)
 
-                print(thing)
+                print(rotationSpaceLocalTransformCounterRotate)
+                #print(thing)
+
+                # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0],
+                #             rotationSpaceLocalTransformCounterRotate[1],
+                #             rotationSpaceLocalTransformCounterRotate[2],
+                #             self.transformName,
+                #             relative=True)
 
                 # cmds.rotate(rotationSpaceLocalTransformCounterRotate[0] - thing[0],
                 #             rotationSpaceLocalTransformCounterRotate[1] - thing[1],
@@ -164,11 +186,11 @@ class Space:
                 #             self.transformName,
                 #             relative=True)
 
-                cmds.rotate(thing[0],
-                            thing[1],
-                            thing[2],
-                            self.transformName,
-                            relative=True)
+                # cmds.rotate(thing[0],
+                #             thing[1],
+                #             thing[2],
+                #             self.transformName,
+                #             relative=True)
 
             if keyEnabled:
                 Util.keyTransforms(self.transformName)
