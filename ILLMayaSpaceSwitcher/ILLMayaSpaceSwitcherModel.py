@@ -128,7 +128,7 @@ class Space:
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
-            Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
+            Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
     def matchToSpace(self, spaceToMatch, keyOptions:Util.KeyOptions):
         if self.transformName is not None and spaceToMatch.transformName is not None:
@@ -139,12 +139,12 @@ class Space:
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
-            Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
+            Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
     def matchControlToSpace(self, keyOptions:Util.KeyOptions):
         # The base rotation space should be allowed to have this called on it by pulling from the base space transform
         if self.transformName is not None or (self.isRotationSpace() and self.getSpaceIndex() == 0):
-            originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
+            originalTransformAttributes = Util.getTransformAttributeDictionary(self.getControlName())
 
             if self.hasRotationSpaces():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
