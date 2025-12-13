@@ -167,7 +167,7 @@ class Space:
                     tempAttributeStates = self.parentSpaceGroup.getAttributes()
 
                     # Force a temporary switch to space to force things to be at the new transform for a bit so our computations work for getting what would be the joint orient
-                    self.switchToSpace()
+                    self.switchToSpace(keyOptions=Util.KeyOptions())
 
                     destinationControlRotationSpaceLocalTransform = self.getControlRotationSpaceLocalRotationTransform()
 
