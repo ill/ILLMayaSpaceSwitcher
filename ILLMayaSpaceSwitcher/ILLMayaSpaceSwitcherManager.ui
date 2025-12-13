@@ -91,7 +91,7 @@
      <item>
       <widget class="QCheckBox" name="cb_keyEnabled">
        <property name="toolTip">
-        <string>Whether or not setting keyframes on attributes and space transforms is enabled.</string>
+        <string>Whether or not setting keyframes from actions is enabled. When auto key is on, this acts like it's on too even if disabled.</string>
        </property>
        <property name="text">
         <string>Key Enabled</string>
@@ -101,10 +101,13 @@
      <item>
       <widget class="QCheckBox" name="cb_forceKeyIfAlreadyAtValueEnabled">
        <property name="toolTip">
-        <string>If set, attribute keys are keyed even when they're already at the value that they are.</string>
+        <string>If set, keys are keyed even when they're already at the value that they are.</string>
        </property>
        <property name="text">
-        <string>Force Attribute Key if Already At Value</string>
+        <string>Force Key if Already At Value</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

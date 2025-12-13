@@ -164,6 +164,9 @@ class IllMayaSpaceWidgetWrapper:
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")
     GEOMETRY_SETTING = "geometry"
+    KEY_ENABLED_SETTING = 'key_enabled'
+    FORCE_KEY_IF_ALREADY_AT_VALUE_ENABLED_SETTING = 'force_key_if_already_at_value_enabled'
+    STEP_TANGENT_KEYS_ENABLED_SETTING = 'step_tangent_keys_enabled'
 
     @staticmethod
     def openMayaMainToolWindowInstance():
@@ -217,7 +220,6 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         # Spaces List Contents
         self.sa_spacesListContents: QtWidgets.QWidget = self.widget.findChild(QtWidgets.QWidget, 'sa_spacesListContents')
 
-
         # set initial window geometry
         restoredGeometry = ILLMayaSpaceSwitcherManager.SETTINGS.value(ILLMayaSpaceSwitcherManager.GEOMETRY_SETTING, None)
 
@@ -226,8 +228,24 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         else:
             try:
                 self.restoreGeometry(restoredGeometry)
-            except Exception as e:
+            except Exception:
+                print("Failed to restore geometry setting")
                 self.resize(800, 480)
+
+        try:
+            self.cb_keyEnabled.setChecked(ILLMayaSpaceSwitcherManager.SETTINGS.value(ILLMayaSpaceSwitcherManager.KEY_ENABLED_SETTING, self.cb_keyEnabled.isChecked(), type=bool))
+        except Exception:
+            print("Failed to restore keyEnabled setting")
+
+        try:
+            self.cb_forceKeyIfAlreadyAtValueEnabled.setChecked(ILLMayaSpaceSwitcherManager.SETTINGS.value(ILLMayaSpaceSwitcherManager.FORCE_KEY_IF_ALREADY_AT_VALUE_ENABLED_SETTING, self.cb_forceKeyIfAlreadyAtValueEnabled.isChecked(), type=bool))
+        except Exception:
+            print("Failed to restore forceKeyIfAlreadyAtValueEnabled setting")
+
+        try:
+            self.cb_stepTangentKeysEnabled.setChecked(ILLMayaSpaceSwitcherManager.SETTINGS.value(ILLMayaSpaceSwitcherManager.STEP_TANGENT_KEYS_ENABLED_SETTING, self.cb_stepTangentKeysEnabled.isChecked(), type=bool))
+        except Exception:
+            print("Failed to restore stepTangentKeysEnabled setting")
 
     def getKeyOptions(self) -> Util.KeyOptions:
         return Util.KeyOptions(keyEnabled=self.cb_keyEnabled.isChecked(),
@@ -248,6 +266,12 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         """
 
         ILLMayaSpaceSwitcherManager.SETTINGS.setValue(ILLMayaSpaceSwitcherManager.GEOMETRY_SETTING, self.saveGeometry())
+
+        ILLMayaSpaceSwitcherManager.SETTINGS.setValue(ILLMayaSpaceSwitcherManager.KEY_ENABLED_SETTING, self.cb_keyEnabled.isChecked())
+        ILLMayaSpaceSwitcherManager.SETTINGS.setValue(ILLMayaSpaceSwitcherManager.FORCE_KEY_IF_ALREADY_AT_VALUE_ENABLED_SETTING, self.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())
+        ILLMayaSpaceSwitcherManager.SETTINGS.setValue(ILLMayaSpaceSwitcherManager.STEP_TANGENT_KEYS_ENABLED_SETTING, self.cb_stepTangentKeysEnabled.isChecked())
+
+        print(type(ILLMayaSpaceSwitcherManager.SETTINGS.value(ILLMayaSpaceSwitcherManager.FORCE_KEY_IF_ALREADY_AT_VALUE_ENABLED_SETTING, self.cb_forceKeyIfAlreadyAtValueEnabled.isChecked())).__name__)
 
         super().closeEvent(event)
 
