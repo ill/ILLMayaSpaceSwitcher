@@ -17,18 +17,23 @@ class KeyOptions:
         self.forceKeyIfAlreadyAtValue: bool = forceKeyIfAlreadyAtValue
         self.stepTangentKeys: bool = stepTangentKeys
 
+
 def getSelectedTransforms():
     return cmds.ls(sl=True, type='transform', long=True)
+
 
 def getSelectedTransform():
     selectedTransforms = getSelectedTransforms()
     return getSelectedTransforms()[0] if len(selectedTransforms) > 0 else None
 
+
 def getShortName(longName):
     return cmds.ls(longName, sn=True)[0] if longName is not None else None
 
+
 def isLongName(name: str) -> bool:
     return ("|" in name) if name is not None else False
+
 
 def clearWidget(widget: QtWidgets.QWidget):
     if widget is None:
@@ -41,6 +46,7 @@ def clearWidget(widget: QtWidgets.QWidget):
             subWidget.setParent(None)
             subWidget.deleteLater()
 
+
 def clearLayout(layout: QtWidgets.QLayout):
     if layout is None:
         return
@@ -52,6 +58,7 @@ def clearLayout(layout: QtWidgets.QLayout):
         if widget is not None:
             widget.setParent(None)
             widget.deleteLater()
+
 
 TRANSLATE_X = 'translateX'
 TRANSLATE_Y = 'translateY'
@@ -74,6 +81,7 @@ SCALE_ATTRIBUTES = [SCALE_X, SCALE_Y, SCALE_Z]
 TR_ATTRIBUTES = TRANSLATE_ATTRIBUTES + ROTATE_ATTRIBUTES
 TRS_ATTRIBUTES = TR_ATTRIBUTES + SCALE_ATTRIBUTES
 
+
 def getAttributeDictionary(node:str, attributes:list[str])->dict[str, float]:
     res = dict[str, float]()
 
@@ -82,9 +90,11 @@ def getAttributeDictionary(node:str, attributes:list[str])->dict[str, float]:
 
     return res
 
+
 # Returns a dictionary of attribute name to value
 def getTransformAttributeDictionary(node:str)->dict[str, float]:
     return getAttributeDictionary(node=node, attributes=TRS_ATTRIBUTES)
+
 
 def keyAttribute(node:str, attribute:str, keyOptions:KeyOptions, originalValues:dict[str, float]):
     if not keyOptions.keyEnabled:
@@ -96,9 +106,10 @@ def keyAttribute(node:str, attribute:str, keyOptions:KeyOptions, originalValues:
         return
 
     if keyOptions.stepTangentKeys:
-        cmds.setKeyframe(node, attribute=attribute, inTangentType='step', outTangentType='step')
+        cmds.setKeyframe(node, attribute=attribute, outTangentType='step')
     else:
         cmds.setKeyframe(node, attribute=attribute)
+
 
 def keyAttributes(node:str, attributes:[str], keyOptions:KeyOptions, originalValues:dict[str, float]):
     if not keyOptions.keyEnabled:
@@ -107,11 +118,14 @@ def keyAttributes(node:str, attributes:[str], keyOptions:KeyOptions, originalVal
     for attribute in attributes:
         keyAttribute(node=node, attribute=attribute, keyOptions=keyOptions, originalValues=originalValues)
 
+
 def keyTransform(node:str, keyOptions:KeyOptions, originalValues:dict[str, float]):
     keyAttributes(node=node, attributes=TRS_ATTRIBUTES, keyOptions=keyOptions, originalValues=originalValues)
 
+
 def keyRotation(node:str, keyOptions:KeyOptions, originalValues:dict[str, float]):
     keyAttributes(node=node, attributes=ROTATE_ATTRIBUTES, keyOptions=keyOptions, originalValues=originalValues)
+
 
 def getOmRotationOrder(node:str):
     return [
@@ -123,11 +137,13 @@ def getOmRotationOrder(node:str):
         om.MEulerRotation.kZYX,
     ][cmds.getAttr(f'{node}.rotateOrder')]
 
+
 def getOmTransformRotation(matrix:om.MMatrix):
     radians = om.MTransformationMatrix(matrix).rotation()
     return (om.MAngle(radians.x).asDegrees(),
             om.MAngle(radians.y).asDegrees(),
             om.MAngle(radians.z).asDegrees())
+
 
 def performOperation(operation, undoChunkName:str, keyOptions:KeyOptions):
     # Is auto key on? If so, temporarily disable it but force keying on in keyOptions so internal operations done by functions are still keying

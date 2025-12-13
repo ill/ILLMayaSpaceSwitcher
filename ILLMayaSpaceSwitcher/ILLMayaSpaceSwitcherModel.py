@@ -128,8 +128,7 @@ class Space:
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
-            if keyOptions.keyEnabled:
-                Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
+            Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
     def matchToSpace(self, spaceToMatch, keyOptions:Util.KeyOptions):
         if self.transformName is not None and spaceToMatch.transformName is not None:
@@ -140,8 +139,7 @@ class Space:
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
-            if keyOptions.keyEnabled:
-                Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
+            Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
     def matchControlToSpace(self, keyOptions:Util.KeyOptions):
         # The base rotation space should be allowed to have this called on it by pulling from the base space transform
@@ -187,11 +185,10 @@ class Space:
                             self.getControlName(),
                             relative=True)
 
-            if keyOptions.keyEnabled:
-                if self.isRotationSpace():
-                    Util.keyRotation(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
-                else:
-                    Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
+            if self.isRotationSpace():
+                Util.keyRotation(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
+            else:
+                Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
     def getAttribute(self) -> float:
         if self.attributeName is None:
