@@ -298,7 +298,7 @@ class SpaceGroup:
     # Restores the state of all the attributes in the space group to these values
     def setAttributes(self, attributes:list[float]) :
         for index, attribute in enumerate(attributes):
-            self.spaces[index].setAttribute(attribute)
+            self.spaces[index].setAttribute(attribute, keyOptions=Util.KeyOptions())
 
 
 # Represents the definition of a single control's collection of spaces
