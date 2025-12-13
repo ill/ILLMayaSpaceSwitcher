@@ -86,57 +86,35 @@ class IllMayaSpaceWidgetWrapper:
         return self.parentManager.getKeyOptions()
 
     def switchToSpaceClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Switch to Space')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.switchToSpace(keyOptions=keyOptions)
 
-        try:
-            self.space.switchToSpace(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
-                                     stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Switch to Space', keyOptions=self.getKeyOptions())
 
     def enableSpaceClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Enable Space')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.setAttribute(attributeValue=1, keyOptions=keyOptions)
 
-        try:
-            self.space.setAttribute(attributeValue=1,
-                                    keyEnabled=self.keyEnabled(),
-                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
-                                    stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Enable Space', keyOptions=self.getKeyOptions())
 
     def disableSpaceClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Disable Space')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.setAttribute(attributeValue=0, keyOptions=keyOptions)
 
-        try:
-            self.space.setAttribute(attributeValue=0,
-                                    keyEnabled=self.keyEnabled(),
-                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
-                                    stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Disable Space', keyOptions=self.getKeyOptions())
 
     def matchAndSwitchSpaceToControlClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match and Switch Space to Control')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.matchToControl(keyOptions=keyOptions)
+            self.space.switchToSpace(keyOptions=keyOptions)
 
-        try:
-            self.space.matchToControl(keyEnabled=self.keyEnabled(),
-                                      stepTangentKeys=self.stepTangentKeysEnabled())
-            self.space.switchToSpace(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
-                                     stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Match and Switch Space to Control', keyOptions=self.getKeyOptions())
 
     def matchSpaceToControlClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match Space to Control')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.matchToControl(keyOptions=keyOptions)
 
-        try:
-            self.space.matchToControl(keyEnabled=self.keyEnabled(),
-                                      stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Match Space to Control', keyOptions=self.getKeyOptions())
 
     def matchSpaceToSpaceClicked(self):
         # Show popup menu of spaces excluding ours
@@ -150,53 +128,35 @@ class IllMayaSpaceWidgetWrapper:
         chosenSpace = menu.exec(self.btn_matchSpaceToSpace.mapToGlobal(self.btn_matchSpaceToSpace.rect().bottomLeft()))
 
         if chosenSpace is not None:
-            cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match Space to Space')
+            def operation(keyOptions: Util.KeyOptions):
+                self.space.matchToSpace(spacesIntersectionToMatch=chosenSpace.data(), keyOptions=keyOptions)
 
-            try:
-                self.space.matchToSpace(spacesIntersectionToMatch=chosenSpace.data(),
-                                        keyEnabled=self.keyEnabled(),
-                                        stepTangentKeys=self.stepTangentKeysEnabled())
-            finally:
-                cmds.undoInfo(closeChunk=True)
+            Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Match Space to Space', keyOptions=self.getKeyOptions())
 
     def matchAndSwitchControlToSpaceClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match and Switch Control to Space')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.matchControlToSpace(keyOptions=keyOptions)
+            self.space.switchToSpace(keyOptions=keyOptions)
 
-        try:
-            self.space.matchControlToSpace(keyEnabled=self.keyEnabled(),
-                                           stepTangentKeys=self.stepTangentKeysEnabled())
-            self.space.switchToSpace(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
-                                     stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Match and Switch Control to Space', keyOptions=self.getKeyOptions())
 
     def matchControlToSpaceClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match Control to Space')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.matchControlToSpace(keyOptions=keyOptions)
 
-        try:
-            self.space.matchControlToSpace(keyEnabled=self.keyEnabled(),
-                                           stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Match Control to Space', keyOptions=self.getKeyOptions())
 
     def selectSpaceObjectClicked(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Select Space Object')
-
-        try:
+        def operation(keyOptions:Util.KeyOptions):
             self.space.selectTransform()
-        finally:
-            cmds.undoInfo(closeChunk=True)
+
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Select Space Object', keyOptions=self.getKeyOptions())
 
     def zeroSpaceObject(self):
-        cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Zero Space Object')
+        def operation(keyOptions:Util.KeyOptions):
+            self.space.zeroTransform(keyOptions=keyOptions)
 
-        try:
-            self.space.zeroTransform(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
-                                     stepTangentKeys=self.stepTangentKeysEnabled())
-        finally:
-            cmds.undoInfo(closeChunk=True)
+        Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Zero Space Object', keyOptions=self.getKeyOptions())
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")

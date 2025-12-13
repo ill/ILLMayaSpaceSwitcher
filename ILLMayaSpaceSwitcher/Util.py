@@ -3,6 +3,7 @@ import maya.api.OpenMaya as om
 import maya.utils
 from PySide6 import QtUiTools, QtCore, QtGui, QtWidgets
 import pathlib
+import copy
 
 PACKAGE_DIR = pathlib.Path(__file__).parent.resolve()
 ICON_DIR = PACKAGE_DIR / "resources" / "icons"
@@ -127,3 +128,20 @@ def getOmTransformRotation(matrix:om.MMatrix):
     return (om.MAngle(radians.x).asDegrees(),
             om.MAngle(radians.y).asDegrees(),
             om.MAngle(radians.z).asDegrees())
+
+def performOperation(operation, undoChunkName:str, keyOptions:KeyOptions):
+    # Is auto key on? If so, temporarily disable it but force keying on in keyOptions so internal operations done by functions are still keying
+    isAutoKeyOn = cmds.autoKeyframe(query=True, state=True)
+
+    cmds.undoInfo(openChunk=True, chunkName=undoChunkName)
+    if isAutoKeyOn:
+        cmds.autoKeyframe(state=False)
+        keyOptions = copy.copy(keyOptions)
+        keyOptions.keyEnabled = True
+
+    try:
+        operation(keyOptions=keyOptions)
+    finally:
+        if isAutoKeyOn:
+            cmds.autoKeyframe(state=True)
+        cmds.undoInfo(closeChunk=True)
