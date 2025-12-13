@@ -14,6 +14,7 @@ import pathlib
 from . import Util
 from . import ILLMayaSpaceSwitcherModel
 
+
 def createGroupNameWidget(groupName: str = None):
     widget = QtUiTools.QUiLoader().load(Util.PACKAGE_DIR / 'ILLMayaSpaceGroupNameWidget.ui')
 
@@ -21,6 +22,7 @@ def createGroupNameWidget(groupName: str = None):
     lbl_spaceGroupName.setText(groupName)
 
     return widget
+
 
 class IllMayaSpaceWidgetWrapper:
     def __init__(self, parentManager, space: ILLMayaSpaceSwitcherModel.SpacesIntersectionSpace):
@@ -157,6 +159,7 @@ class IllMayaSpaceWidgetWrapper:
             self.space.zeroTransform(keyOptions=keyOptions)
 
         Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Zero Space Object', keyOptions=self.getKeyOptions())
+
 
 class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherManager")

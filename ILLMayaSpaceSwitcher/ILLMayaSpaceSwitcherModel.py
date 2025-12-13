@@ -7,6 +7,7 @@ from . import Util
 
 ILLMayaSpaceSwitcherConfigAttributeName: str = 'ILLMayaSpaceSwitcherConfig'
 
+
 # A definition of an individual space
 class Space:
     def __init__(self,
@@ -106,14 +107,14 @@ class Space:
         return self.parentSpaceGroup.getControlRotationSpaceLocalRotationTransform()
 
     # Switches to this space
-    def switchToSpace(self, keyOptions:Util.KeyOptions):
+    def switchToSpace(self, keyOptions: Util.KeyOptions):
         # Set the attribute of every control after us to 0
         for spaceIndex in range(self.getSpaceIndex() + 1, len(self.parentSpaceGroup.spaces)):
             self.parentSpaceGroup.spaces[spaceIndex].setAttribute(attributeValue=0, keyOptions=keyOptions)
 
         self.setAttribute(attributeValue=1, keyOptions=keyOptions)
 
-    def matchToControl(self, keyOptions:Util.KeyOptions):
+    def matchToControl(self, keyOptions: Util.KeyOptions):
         if self.transformName is not None:
             originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
 
@@ -130,7 +131,7 @@ class Space:
 
             Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
-    def matchToSpace(self, spaceToMatch, keyOptions:Util.KeyOptions):
+    def matchToSpace(self, spaceToMatch, keyOptions: Util.KeyOptions):
         if self.transformName is not None and spaceToMatch.transformName is not None:
             originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
 
@@ -141,7 +142,7 @@ class Space:
 
             Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
-    def matchControlToSpace(self, keyOptions:Util.KeyOptions):
+    def matchControlToSpace(self, keyOptions: Util.KeyOptions):
         # The base rotation space should be allowed to have this called on it by pulling from the base space transform
         if self.transformName is not None or (self.isRotationSpace() and self.getSpaceIndex() == 0):
             originalTransformAttributes = Util.getTransformAttributeDictionary(self.getControlName())
@@ -196,7 +197,7 @@ class Space:
 
         return cmds.getAttr(f'{self.getControlName()}.{self.attributeName}')
 
-    def setAttribute(self, attributeValue: float, keyOptions:Util.KeyOptions):
+    def setAttribute(self, attributeValue: float, keyOptions: Util.KeyOptions):
         if self.attributeName is not None:
             originalValues = Util.getAttributeDictionary(node=self.getControlName(), attributes=[self.attributeName])
 
@@ -208,7 +209,7 @@ class Space:
         if self.transformName is not None:
             cmds.select(self.transformName, add=True)
 
-    def zeroTransform(self, keyOptions:Util.KeyOptions):
+    def zeroTransform(self, keyOptions: Util.KeyOptions):
         if self.transformName is not None:
             originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
 
@@ -219,6 +220,7 @@ class Space:
                 cmds.setAttr(f'{self.transformName}.{attribute}', 1)
 
             Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
+
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
@@ -416,11 +418,12 @@ class Spaces:
                                  math.radians(controlRotationSpaceLocalRotation[2]),
                                  Util.getOmRotationOrder(self.controlName)).asMatrix()
 
+
 class SpacesIntersectionSpace:
     def __init__(self,
                  parentSpacesIntersectionGroup,
                  name: str = '',
-                 spaces:list[Space] = None):
+                 spaces: list[Space] = None):
         self.parentSpacesIntersectionGroup = parentSpacesIntersectionGroup
         self.name = name
         self.spaces = spaces
@@ -456,6 +459,7 @@ class SpacesIntersectionSpace:
     def zeroTransform(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
             space.zeroTransform(keyOptions=keyOptions)
+
 
 class SpacesIntersectionGroup:
     def __init__(self, parentSpacesIntersection, name: str = ''):
@@ -500,6 +504,7 @@ class SpacesIntersectionGroup:
 
                 if not didFind:
                     del self.spaces[orderedSpaceNamesIndex]
+
 
 # When working with multiple selected controls, this tracks the intersection of the set of what the selected spaces are among the objects as long as their space names match and are in the same order
 class SpacesIntersection:

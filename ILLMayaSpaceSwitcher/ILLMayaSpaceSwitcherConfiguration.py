@@ -14,6 +14,7 @@ import pathlib
 from . import Util
 from . import ILLMayaSpaceSwitcherModel
 
+
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
     SETTINGS = QtCore.QSettings("ILL", "MayaSpaceSwitcherConfiguration")
     GEOMETRY_SETTING = "geometry"
@@ -88,7 +89,6 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
 
         # Selected Control Attributes Editor
         self.te_selectedControlAttributes: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_selectedControlAttributes')
-
 
         # set initial window geometry
         restoredGeometry = ILLMayaSpaceSwitcherConfiguration.SETTINGS.value(

@@ -8,6 +8,7 @@ import copy
 PACKAGE_DIR = pathlib.Path(__file__).parent.resolve()
 ICON_DIR = PACKAGE_DIR / "resources" / "icons"
 
+
 class KeyOptions:
     def __init__(self,
                  keyEnabled: bool = False,
@@ -82,7 +83,7 @@ TR_ATTRIBUTES = TRANSLATE_ATTRIBUTES + ROTATE_ATTRIBUTES
 TRS_ATTRIBUTES = TR_ATTRIBUTES + SCALE_ATTRIBUTES
 
 
-def getAttributeDictionary(node:str, attributes:list[str])->dict[str, float]:
+def getAttributeDictionary(node: str, attributes: list[str]) -> dict[str, float]:
     res = dict[str, float]()
 
     for attribute in attributes:
@@ -92,11 +93,11 @@ def getAttributeDictionary(node:str, attributes:list[str])->dict[str, float]:
 
 
 # Returns a dictionary of attribute name to value
-def getTransformAttributeDictionary(node:str)->dict[str, float]:
+def getTransformAttributeDictionary(node: str) -> dict[str, float]:
     return getAttributeDictionary(node=node, attributes=TRS_ATTRIBUTES)
 
 
-def keyAttribute(node:str, attribute:str, keyOptions:KeyOptions, originalValues:dict[str, float]):
+def keyAttribute(node: str, attribute: str, keyOptions: KeyOptions, originalValues: dict[str, float]):
     if not keyOptions.keyEnabled:
         return
 
@@ -111,7 +112,7 @@ def keyAttribute(node:str, attribute:str, keyOptions:KeyOptions, originalValues:
         cmds.setKeyframe(node, attribute=attribute)
 
 
-def keyAttributes(node:str, attributes:[str], keyOptions:KeyOptions, originalValues:dict[str, float]):
+def keyAttributes(node: str, attributes: [str], keyOptions: KeyOptions, originalValues: dict[str, float]):
     if not keyOptions.keyEnabled:
         return
 
@@ -119,15 +120,15 @@ def keyAttributes(node:str, attributes:[str], keyOptions:KeyOptions, originalVal
         keyAttribute(node=node, attribute=attribute, keyOptions=keyOptions, originalValues=originalValues)
 
 
-def keyTransform(node:str, keyOptions:KeyOptions, originalValues:dict[str, float]):
+def keyTransform(node: str, keyOptions: KeyOptions, originalValues: dict[str, float]):
     keyAttributes(node=node, attributes=TRS_ATTRIBUTES, keyOptions=keyOptions, originalValues=originalValues)
 
 
-def keyRotation(node:str, keyOptions:KeyOptions, originalValues:dict[str, float]):
+def keyRotation(node: str, keyOptions: KeyOptions, originalValues: dict[str, float]):
     keyAttributes(node=node, attributes=ROTATE_ATTRIBUTES, keyOptions=keyOptions, originalValues=originalValues)
 
 
-def getOmRotationOrder(node:str):
+def getOmRotationOrder(node: str):
     return [
         om.MEulerRotation.kXYZ,
         om.MEulerRotation.kYZX,
@@ -138,14 +139,14 @@ def getOmRotationOrder(node:str):
     ][cmds.getAttr(f'{node}.rotateOrder')]
 
 
-def getOmTransformRotation(matrix:om.MMatrix):
+def getOmTransformRotation(matrix: om.MMatrix):
     radians = om.MTransformationMatrix(matrix).rotation()
     return (om.MAngle(radians.x).asDegrees(),
             om.MAngle(radians.y).asDegrees(),
             om.MAngle(radians.z).asDegrees())
 
 
-def performOperation(operation, undoChunkName:str, keyOptions:KeyOptions):
+def performOperation(operation, undoChunkName: str, keyOptions: KeyOptions):
     # Is auto key on? If so, temporarily disable it but force keying on in keyOptions so internal operations done by functions are still keying
     isAutoKeyOn = cmds.autoKeyframe(query=True, state=True)
 
