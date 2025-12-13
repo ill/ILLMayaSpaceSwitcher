@@ -106,15 +106,17 @@ class Space:
         return self.parentSpaceGroup.getControlRotationSpaceLocalRotationTransform()
 
     # Switches to this space
-    def switchToSpace(self, keyEnabled:bool = False, forceKeyIfAlreadyAtValue:bool = False):
+    def switchToSpace(self, keyOptions:Util.KeyOptions):
         # Set the attribute of every control after us to 0
         for spaceIndex in range(self.getSpaceIndex() + 1, len(self.parentSpaceGroup.spaces)):
-            self.parentSpaceGroup.spaces[spaceIndex].setAttribute(attributeValue=0, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+            self.parentSpaceGroup.spaces[spaceIndex].setAttribute(attributeValue=0, keyOptions=keyOptions)
 
-        self.setAttribute(attributeValue=1, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+        self.setAttribute(attributeValue=1, keyOptions=keyOptions)
 
-    def matchToControl(self, keyEnabled: bool = False):
+    def matchToControl(self, keyOptions:Util.KeyOptions):
         if self.transformName is not None:
+            originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
+
             # Find control relative transform, put us at the inverse of that
             destinationTransformWorldTransform = self.getControlInverseLocalTransform() * self.getControlWorldTransform()
 
@@ -126,22 +128,26 @@ class Space:
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
-            if keyEnabled:
-                Util.keyTransforms(self.transformName)
+            if keyOptions.keyEnabled:
+                Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
-    def matchToSpace(self, spaceToMatch, keyEnabled: bool = False):
+    def matchToSpace(self, spaceToMatch, keyOptions:Util.KeyOptions):
         if self.transformName is not None and spaceToMatch.transformName is not None:
+            originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
+
             # Simply copy the transform of the space we're matching
             destinationTransformLocalTransform = spaceToMatch.getTransformWorldTransform() * self.getTransformParentInverseWorldTransform()
 
             cmds.xform(self.transformName, matrix=list(destinationTransformLocalTransform))
 
-            if keyEnabled:
-                Util.keyTransforms(self.transformName)
+            if keyOptions.keyEnabled:
+                Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
-    def matchControlToSpace(self, keyEnabled: bool = False):
+    def matchControlToSpace(self, keyOptions:Util.KeyOptions):
         # The base rotation space should be allowed to have this called on it by pulling from the base space transform
         if self.transformName is not None or (self.isRotationSpace() and self.getSpaceIndex() == 0):
+            originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
+
             if self.hasRotationSpaces():
                 # Find what the joint orient of the rotation space would end up being when set to this space and counter rotate the transform by that
                 # This is the rotation space joint orient now
@@ -181,11 +187,11 @@ class Space:
                             self.getControlName(),
                             relative=True)
 
-            if keyEnabled:
+            if keyOptions.keyEnabled:
                 if self.isRotationSpace():
-                    Util.keyRotation(self.getControlName())
+                    Util.keyRotation(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
                 else:
-                    Util.keyTransforms(self.getControlName())
+                    Util.keyTransform(node=self.getControlName(), keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
     def getAttribute(self) -> float:
         if self.attributeName is None:
@@ -193,34 +199,29 @@ class Space:
 
         return cmds.getAttr(f'{self.getControlName()}.{self.attributeName}')
 
-
-    def setAttribute(self, attributeValue: float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+    def setAttribute(self, attributeValue: float, keyOptions:Util.KeyOptions):
         if self.attributeName is not None:
-            controlName = self.getControlName()
+            originalValues = Util.getAttributeDictionary(node=self.getControlName(), attributes=[self.attributeName])
 
-            if forceKeyIfAlreadyAtValue or self.getAttribute() != attributeValue:
-                cmds.setAttr(f'{controlName}.{self.attributeName}', attributeValue)
+            cmds.setAttr(f'{self.getControlName()}.{self.attributeName}', attributeValue)
 
-                if keyEnabled:
-                    cmds.setKeyframe(controlName, attribute=self.attributeName)
+            Util.keyAttribute(node=self.getControlName(), attribute=self.attributeName, keyOptions=keyOptions, originalValues=originalValues)
 
     def selectTransform(self):
         if self.transformName is not None:
             cmds.select(self.transformName, add=True)
 
-    def zeroTransform(self):
+    def zeroTransform(self, keyOptions:Util.KeyOptions):
         if self.transformName is not None:
-            cmds.setAttr(f'{self.transformName}.translateX', 0)
-            cmds.setAttr(f'{self.transformName}.translateY', 0)
-            cmds.setAttr(f'{self.transformName}.translateZ', 0)
+            originalTransformAttributes = Util.getTransformAttributeDictionary(self.transformName)
 
-            cmds.setAttr(f'{self.transformName}.rotateX', 0)
-            cmds.setAttr(f'{self.transformName}.rotateY', 0)
-            cmds.setAttr(f'{self.transformName}.rotateZ', 0)
+            for attribute in Util.TR_ATTRIBUTES:
+                cmds.setAttr(f'{self.transformName}.{attribute}', 0)
 
-            cmds.setAttr(f'{self.transformName}.scaleX', 1)
-            cmds.setAttr(f'{self.transformName}.scaleY', 1)
-            cmds.setAttr(f'{self.transformName}.scaleZ', 1)
+            for attribute in Util.SCALE_ATTRIBUTES:
+                cmds.setAttr(f'{self.transformName}.{attribute}', 1)
+
+            Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
@@ -419,32 +420,35 @@ class Spaces:
                                  Util.getOmRotationOrder(self.controlName)).asMatrix()
 
 class SpacesIntersectionSpace:
-    def __init__(self, parentSpacesIntersectionGroup, name: str = '', spaces:list[Space] = None):
+    def __init__(self,
+                 parentSpacesIntersectionGroup,
+                 name: str = '',
+                 spaces:list[Space] = None):
         self.parentSpacesIntersectionGroup = parentSpacesIntersectionGroup
         self.name = name
         self.spaces = spaces
 
-    def switchToSpace(self, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+    def switchToSpace(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
-            space.switchToSpace(keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+            space.switchToSpace(keyOptions=keyOptions)
 
-    def setAttribute(self, attributeValue:float, keyEnabled: bool = False, forceKeyIfAlreadyAtValue: bool = False):
+    def setAttribute(self, attributeValue:float, keyOptions: Util.KeyOptions):
         for space in self.spaces:
-            space.setAttribute(attributeValue=attributeValue, keyEnabled=keyEnabled, forceKeyIfAlreadyAtValue=forceKeyIfAlreadyAtValue)
+            space.setAttribute(attributeValue=attributeValue, keyOptions=keyOptions)
 
-    def matchToControl(self, keyEnabled: bool = False):
+    def matchToControl(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
-            space.matchToControl(keyEnabled=keyEnabled)
+            space.matchToControl(keyOptions=keyOptions)
 
-    def matchToSpace(self, spacesIntersectionToMatch, keyEnabled: bool = False):
+    def matchToSpace(self, spacesIntersectionToMatch, keyOptions: Util.KeyOptions):
         for space in self.spaces:
             for spaceToMatch in spacesIntersectionToMatch.spaces:
                 if space.parentSpaceGroup == spaceToMatch.parentSpaceGroup:
-                    space.matchToSpace(spaceToMatch=spaceToMatch, keyEnabled=keyEnabled)
+                    space.matchToSpace(spaceToMatch=spaceToMatch, keyOptions=keyOptions)
 
-    def matchControlToSpace(self, keyEnabled: bool = False):
+    def matchControlToSpace(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
-            space.matchControlToSpace(keyEnabled=keyEnabled)
+            space.matchControlToSpace(keyOptions=keyOptions)
 
     def selectTransform(self):
         cmds.select(clear=True)
@@ -452,9 +456,9 @@ class SpacesIntersectionSpace:
         for space in self.spaces:
             space.selectTransform()
 
-    def zeroTransform(self):
+    def zeroTransform(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
-            space.zeroTransform()
+            space.zeroTransform(keyOptions=keyOptions)
 
 class SpacesIntersectionGroup:
     def __init__(self, parentSpacesIntersection, name: str = ''):

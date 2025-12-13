@@ -82,18 +82,16 @@ class IllMayaSpaceWidgetWrapper:
         self.btn_zeroSpaceObject.setIcon(QtGui.QIcon(str(Util.ICON_DIR / 'ZeroSpaceObject.png')))
         self.btn_zeroSpaceObject.clicked.connect(self.zeroSpaceObject)
 
-    def keyEnabled(self) -> bool:
-        return self.parentManager.keyEnabled()
-
-    def forceKeyIfAlreadyAtValueEnabled(self) -> bool:
-        return self.parentManager.forceKeyIfAlreadyAtValueEnabled()
+    def getKeyOptions(self) -> Util.KeyOptions:
+        return self.parentManager.getKeyOptions()
 
     def switchToSpaceClicked(self):
         cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Switch to Space')
 
         try:
             self.space.switchToSpace(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
+                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
+                                     stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -103,7 +101,8 @@ class IllMayaSpaceWidgetWrapper:
         try:
             self.space.setAttribute(attributeValue=1,
                                     keyEnabled=self.keyEnabled(),
-                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
+                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
+                                    stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -113,7 +112,8 @@ class IllMayaSpaceWidgetWrapper:
         try:
             self.space.setAttribute(attributeValue=0,
                                     keyEnabled=self.keyEnabled(),
-                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
+                                    forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
+                                    stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -121,9 +121,11 @@ class IllMayaSpaceWidgetWrapper:
         cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match and Switch Space to Control')
 
         try:
-            self.space.matchToControl(keyEnabled=self.keyEnabled())
+            self.space.matchToControl(keyEnabled=self.keyEnabled(),
+                                      stepTangentKeys=self.stepTangentKeysEnabled())
             self.space.switchToSpace(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
+                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
+                                     stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -131,7 +133,8 @@ class IllMayaSpaceWidgetWrapper:
         cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match Space to Control')
 
         try:
-            self.space.matchToControl(keyEnabled=self.keyEnabled())
+            self.space.matchToControl(keyEnabled=self.keyEnabled(),
+                                      stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -151,7 +154,8 @@ class IllMayaSpaceWidgetWrapper:
 
             try:
                 self.space.matchToSpace(spacesIntersectionToMatch=chosenSpace.data(),
-                                        keyEnabled=self.keyEnabled())
+                                        keyEnabled=self.keyEnabled(),
+                                        stepTangentKeys=self.stepTangentKeysEnabled())
             finally:
                 cmds.undoInfo(closeChunk=True)
 
@@ -159,9 +163,11 @@ class IllMayaSpaceWidgetWrapper:
         cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match and Switch Control to Space')
 
         try:
-            self.space.matchControlToSpace(keyEnabled=self.keyEnabled())
+            self.space.matchControlToSpace(keyEnabled=self.keyEnabled(),
+                                           stepTangentKeys=self.stepTangentKeysEnabled())
             self.space.switchToSpace(keyEnabled=self.keyEnabled(),
-                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled())
+                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
+                                     stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -169,7 +175,8 @@ class IllMayaSpaceWidgetWrapper:
         cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Match Control to Space')
 
         try:
-            self.space.matchControlToSpace(keyEnabled=self.keyEnabled())
+            self.space.matchControlToSpace(keyEnabled=self.keyEnabled(),
+                                           stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -185,7 +192,9 @@ class IllMayaSpaceWidgetWrapper:
         cmds.undoInfo(openChunk=True, chunkName='ILL Maya Space Switcher Zero Space Object')
 
         try:
-            self.space.zeroTransform()
+            self.space.zeroTransform(keyEnabled=self.keyEnabled(),
+                                     forceKeyIfAlreadyAtValue=self.forceKeyIfAlreadyAtValueEnabled(),
+                                     stepTangentKeys=self.stepTangentKeysEnabled())
         finally:
             cmds.undoInfo(closeChunk=True)
 
@@ -239,8 +248,8 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         # Force Key if Already At Value Check Box
         self.cb_forceKeyIfAlreadyAtValueEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_forceKeyIfAlreadyAtValueEnabled')
 
-        # Auto Refresh Enabled Check Box
-        self.cb_autoRefreshEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_autoRefreshEnabled')
+        # Step Tangent Keys Enabled Check Box
+        self.cb_stepTangentKeysEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_stepTangentKeysEnabled')
 
         # Spaces List Contents
         self.sa_spacesListContents: QtWidgets.QWidget = self.widget.findChild(QtWidgets.QWidget, 'sa_spacesListContents')
@@ -257,11 +266,10 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
             except Exception as e:
                 self.resize(800, 480)
 
-    def keyEnabled(self) -> bool:
-        return self.cb_keyEnabled.isChecked()
-
-    def forceKeyIfAlreadyAtValueEnabled(self) -> bool:
-        return self.cb_forceKeyIfAlreadyAtValueEnabled.isChecked()
+    def getKeyOptions(self) -> Util.KeyOptions:
+        return Util.KeyOptions(keyEnabled=self.cb_keyEnabled.isChecked(),
+                               forceKeyIfAlreadyAtValue=self.cb_forceKeyIfAlreadyAtValueEnabled.isChecked(),
+                               stepTangentKeys=self.cb_stepTangentKeysEnabled.isChecked())
 
     def resizeEvent(self, event):
         """

@@ -90,6 +90,9 @@
     <layout class="QHBoxLayout" name="hl_upperOptions">
      <item>
       <widget class="QCheckBox" name="cb_keyEnabled">
+       <property name="toolTip">
+        <string>Whether or not setting keyframes on attributes and space transforms is enabled.</string>
+       </property>
        <property name="text">
         <string>Key Enabled</string>
        </property>
@@ -97,15 +100,21 @@
      </item>
      <item>
       <widget class="QCheckBox" name="cb_forceKeyIfAlreadyAtValueEnabled">
+       <property name="toolTip">
+        <string>If set, attribute keys are keyed even when they're already at the value that they are.</string>
+       </property>
        <property name="text">
-        <string>Force Key if Already At Value</string>
+        <string>Force Attribute Key if Already At Value</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cb_autoRefreshEnabled">
+      <widget class="QCheckBox" name="cb_stepTangentKeysEnabled">
+       <property name="toolTip">
+        <string>Makes the keys be step tangent which is what you'd normally want when working with spaces.</string>
+       </property>
        <property name="text">
-        <string>Auto Refresh Selections</string>
+        <string>Step Tangent Keys</string>
        </property>
        <property name="checked">
         <bool>true</bool>
