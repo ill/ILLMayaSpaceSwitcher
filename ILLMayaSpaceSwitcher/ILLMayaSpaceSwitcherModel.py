@@ -58,6 +58,20 @@ class Space:
                    attributeName=attributeName,
                    transformName=transformName)
 
+    def getJsonData(self) -> {}:
+        res = {}
+
+        if self.name is not None:
+            res['name'] = self.name
+
+        if self.attributeName is not None:
+            res['attributeName'] = self.attributeName
+
+        if self.transformName is not None:
+            res['transformName'] = self.transformName
+
+        return res if len(res) > 0 else None
+
     def getControlName(self) -> str:
         return self.parentSpaceGroup.getControlName()
 
@@ -236,7 +250,7 @@ class SpaceGroup:
         # The spaces themselves
         self.spaces: list[Space] = spaces
 
-        # Some setup an extra validation
+        # Some setup and extra validation
         for spaceIndex, space in enumerate(self.spaces):
             # only the first space is allowed to not have an attribute name, meaning it's a base space
             if spaceIndex != 0 and space.attributeName is None:
@@ -254,6 +268,21 @@ class SpaceGroup:
         return cls(name=name,
                    spaces=[Space.fromJsonData(controlName=controlName, jsonData=spaceDefinitionJsonData)
                            for spaceDefinitionJsonData in definitionsJsonData] if definitionsJsonData is not None else None)
+
+    def getJsonData(self) -> {}:
+        res = {}
+
+        definitionsJsonData: list[{}] = []
+
+        for space in self.spaces:
+            spaceJsonData = space.getJsonData()
+            if spaceJsonData is not None:
+                definitionsJsonData.append(spaceJsonData)
+
+        if len(definitionsJsonData) > 0:
+            res['Definitions'] = definitionsJsonData
+
+        return res if len(res) > 0 else None
 
     def getControlName(self) -> str:
         return self.parentSpaces.controlName
@@ -296,7 +325,7 @@ class SpaceGroup:
         return [space.getAttribute() for space in self.spaces]
 
     # Restores the state of all the attributes in the space group to these values
-    def setAttributes(self, attributes:list[float]) :
+    def setAttributes(self, attributes: list[float]):
         for index, attribute in enumerate(attributes):
             self.spaces[index].setAttribute(attribute, keyOptions=Util.KeyOptions())
 
@@ -356,6 +385,26 @@ class Spaces:
         return cls(controlName=controlName,
                    spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
                    rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
+
+    def getJsonData(self) -> {}:
+        res = {}
+
+        if self.spaces is not None:
+            jsonData = self.spaces.getJsonData()
+
+            if jsonData is not None:
+                res[self.spaces.name] = jsonData
+
+        if self.rotationSpaces is not None:
+            jsonData = self.rotationSpaces.getJsonData()
+
+            if jsonData is not None:
+                res[self.rotationSpaces.name] = jsonData
+
+        return res if len(res) > 0 else None
+
+    def getJsonString(self) -> str:
+        return json.dumps(self.getJsonData(), indent='\t')
 
     def hasSpaces(self) -> bool:
         return self.spaces is not None

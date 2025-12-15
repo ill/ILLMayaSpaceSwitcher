@@ -55,6 +55,16 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="btn_generateAutoJsonContents">
+           <property name="toolTip">
+            <string>This makes an attempt to auto generate some JSON that can be used as a base. It makes a best guess based on the name of the control and the names of the attributes already configured.</string>
+           </property>
+           <property name="text">
+            <string>Auto Generate JSON</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

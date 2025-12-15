@@ -13,6 +13,7 @@ import pathlib
 
 from . import Util
 from . import ILLMayaSpaceSwitcherModel
+from . import ILLMayaSpaceSwitcherAutoGenerator
 
 
 class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
@@ -61,6 +62,10 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         # Generate Default JSON Button
         self.btn_generateDefaultJsonContents: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_generateDefaultJsonContents')
         self.btn_generateDefaultJsonContents.clicked.connect(self.generateDefaultJsonContentsPressed)
+
+        # Auto Generate JSON Button
+        self.btn_generateAutoJsonContents: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_generateAutoJsonContents')
+        self.btn_generateAutoJsonContents.clicked.connect(self.generateAutoJsonContentsPressed)
 
         # JSON Contents Editor
         self.te_jsonContents: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_jsonContents')
@@ -163,6 +168,9 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             '\t}\n'
             '}'
         )
+
+    def generateAutoJsonContentsPressed(self):
+        self.te_jsonContents.setPlainText(ILLMayaSpaceSwitcherAutoGenerator.ILLMayaSpaceSwitcherAutoGenerator(controlName=self.selectedControl).getJsonString())
 
     def validate(self):
         if self.selectedControl is None:
