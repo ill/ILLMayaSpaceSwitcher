@@ -379,7 +379,7 @@ class Spaces:
         rotationSpacesJsonData = jsonData.get('Rotation Spaces', None)
 
         # Rotation spaces should only exist on controls that are "joints"
-        if not cmds.nodeType(controlName) == 'joint':
+        if rotationSpacesJsonData is not None and not cmds.nodeType(controlName) == 'joint':
             raise TypeError(f'Rotation spaces should only exist on joint type controls because it uses the joint orient to control the rotation space')
 
         return cls(controlName=controlName,
