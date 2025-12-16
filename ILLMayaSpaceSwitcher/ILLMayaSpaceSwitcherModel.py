@@ -40,13 +40,14 @@ class Space:
             name = cmds.attributeQuery(attributeName, node=controlName, niceName=True)
 
         transformName = jsonData.get('transformName', None)
+        nameSpacedTransformName = Util.addNameSpaceToLongName(longName=transformName, nameSpace=Util.getNameSpace(node=controlName))
 
         if transformName is not None:
-            if not cmds.objExists(transformName):
-                raise NameError(f'No object "{transformName}" exists in the scene')
+            if not cmds.objExists(nameSpacedTransformName):
+                raise NameError(f'No object "{nameSpacedTransformName}" exists in the scene')
 
-            if not cmds.nodeType(transformName) == 'transform':
-                raise TypeError(f'Object "{transformName}" is not a transform type')
+            if not cmds.nodeType(nameSpacedTransformName) == 'transform':
+                raise TypeError(f'Object "{nameSpacedTransformName}" is not a transform type')
 
             if not Util.isLongName(transformName):
                 raise NameError(f'Use long names only for transform "{transformName}"')
@@ -56,7 +57,7 @@ class Space:
 
         return cls(name=name,
                    attributeName=attributeName,
-                   transformName=transformName)
+                   transformName=nameSpacedTransformName)
 
     def getJsonData(self) -> {}:
         res = {}
@@ -74,6 +75,9 @@ class Space:
 
     def getControlName(self) -> str:
         return self.parentSpaceGroup.getControlName()
+
+    def getNameSpace(self) -> str:
+        return self.parentSpaceGroup.getNameSpace()
 
     def getSpaceIndex(self) -> int:
         return self.parentSpaceGroup.getSpaceIndex(self)
@@ -287,6 +291,9 @@ class SpaceGroup:
     def getControlName(self) -> str:
         return self.parentSpaces.controlName
 
+    def getNameSpace(self) -> str:
+        return self.parentSpaces.getNameSpace()
+
     def getSpaceIndex(self, space: Space) -> int:
         return self.spaces.index(space)
 
@@ -411,6 +418,9 @@ class Spaces:
 
     def hasRotationSpaces(self) -> bool:
         return self.rotationSpaces is not None
+
+    def getNameSpace(self) -> str:
+        return Util.getNameSpace(self.controlName) if self.controlName is not None else None
 
     def getControlWorldTransform(self):
         if self.controlName is None:

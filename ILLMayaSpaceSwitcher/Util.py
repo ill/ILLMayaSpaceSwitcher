@@ -36,6 +36,46 @@ def isLongName(name: str) -> bool:
     return ("|" in name) if name is not None else False
 
 
+def getNameSpace(node: str) -> str:
+    """
+    Returns the namespace part of a node, including the trailing ':'.
+    e.g. 'charA:main_CTRL' -> 'charA:'
+         'ns1:ns2:ctrl'   -> 'ns1:ns2:'
+         'main_CTRL'      -> ''
+    Works with long DAG paths too.
+    """
+    # Work on the leaf name in case we got a |path|to|node
+    leaf = node.split("|")[-1]
+    if ":" not in leaf:
+        return ""
+    return leaf.rsplit(":", 1)[0] + ":"
+
+
+def addNameSpaceToLongName(longName: str, nameSpace: str) -> str:
+    """
+    Inserts a namespace (must end with ':' or be empty) into every DAG segment.
+    Example:
+        '|root|spine|ctrl' + 'charA:' → '|charA:root|charA:spine|charA:ctrl'
+    """
+    if not longName or not nameSpace:
+        return longName
+
+    if not nameSpace.endswith(":"):
+        nameSpace += ":"
+
+    parts = longName.split("|")
+    newParts = []
+
+    for part in parts:
+        if not part:
+            # the very first element from split("") is empty because string starts with '|'
+            newParts.append("")
+        else:
+            newParts.append(nameSpace + part)
+
+    return "|".join(newParts)
+
+
 def clearWidget(widget: QtWidgets.QWidget):
     if widget is None:
         return
