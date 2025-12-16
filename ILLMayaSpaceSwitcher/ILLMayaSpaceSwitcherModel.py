@@ -539,6 +539,7 @@ class SpacesIntersectionGroup:
                     break
 
                 didFind = False
+                preSearchSpaceIndex = spaceIndex
 
                 # look for the space name in spaceIntersectionSpaces, if there, then we're good on this named space, otherwise remove it from the intersection so far
                 while spaceIndex < len(spaceGroup.spaces):
@@ -553,6 +554,7 @@ class SpacesIntersectionGroup:
 
                 if not didFind:
                     del self.spaces[orderedSpaceNamesIndex]
+                    spaceIndex = preSearchSpaceIndex
 
 
 # When working with multiple selected controls, this tracks the intersection of the set of what the selected spaces are among the objects as long as their space names match and are in the same order
