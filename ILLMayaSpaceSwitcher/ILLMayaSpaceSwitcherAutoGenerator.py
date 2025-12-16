@@ -109,11 +109,15 @@ class ILLMayaSpaceSwitcherAutoGenerator:
 
         res = attributeNiceName
 
+        # Remove the Rot at the start for rotation spaces
+        if isRotationSpace:
+            res = res[len('Rot '):]
+
         # Some special cases
-        if attributeNiceName == 'Space COG':
+        if res == 'Space COG':
             return 'space_COG'
 
-        if attributeNiceName.startswith('Space Aux '):
+        if res.startswith('Space Aux '):
             auxSpaceNumber = int(attributeNiceName[len('Space Aux '):])
             return f'space_auxiliary_{auxSpaceNumber:02d}'
 
