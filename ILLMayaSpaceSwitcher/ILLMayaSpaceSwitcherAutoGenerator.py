@@ -69,6 +69,7 @@ class ILLMayaSpaceSwitcherAutoGenerator:
         # If not keyable, the space name is the attribute nice name
         if cmds.getAttr(f'{self.controlName}.{attributeName}', keyable=True):
             return ILLMayaSpaceSwitcherModel.Space(attributeName=attributeName,
+                                                   defaultAttributeValue=cmds.getAttr(f'{self.controlName}.{attributeName}'),
                                                    transformName=self.findSpaceTransform(attributeName=attributeName, isRotationSpace=isRotationSpace))
         else:
             return ILLMayaSpaceSwitcherModel.Space(name=cmds.attributeQuery(attributeName, node=self.controlName, niceName=True),

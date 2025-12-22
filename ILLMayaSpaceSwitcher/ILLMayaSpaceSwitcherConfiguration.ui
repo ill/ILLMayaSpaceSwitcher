@@ -92,6 +92,13 @@
        <item>
         <layout class="QHBoxLayout" name="hl_set">
          <item>
+          <widget class="QPushButton" name="btn_updateDefaultAttributeValues">
+           <property name="text">
+            <string>Update Default Attribute Values</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btn_validate">
            <property name="text">
             <string>Validate JSON</string>

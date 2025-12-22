@@ -70,6 +70,10 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
         # JSON Contents Editor
         self.te_jsonContents: QtWidgets.QPlainTextEdit = self.widget.findChild(QtWidgets.QPlainTextEdit, 'te_jsonContents')
 
+        # Update Default Attribute Values
+        self.btn_updateDefaultAttributeValues: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_updateDefaultAttributeValues')
+        self.btn_updateDefaultAttributeValues.clicked.connect(self.updateDefaultAttributeValuesPressed)
+
         # Validate JSON Button
         self.btn_validate: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_validate')
         self.btn_validate.clicked.connect(self.validatePressed)
@@ -146,10 +150,12 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             '\t\t\t\t"name": "Space World (Can be omitted and derived from attribute nice name, required if no attribute name)",\n'
             '\t\t\t\t"attributeName": "InternalAttributeName (Not Nice Name but internal script name, omit for first base space if no attribute associated with space)",\n'
             '\t\t\t\t"transformName": "|LongName|COG_CTRL__space_world__LOC"\n'
+            '\t\t\t\t"defaultAttributeValue": 1\n'
             '\t\t\t},\n'
             '\t\t\t{\n'
             '\t\t\t\t"attributeName": "InternalAttributeName (Not Nice Name but internal script name)",\n'
             '\t\t\t\t"transformName": "|LongName|COG_CTRL__space_rig_main__LOC"\n'
+            '\t\t\t\t"defaultAttributeValue": 0\n'
             '\t\t\t}\n'
             '\t\t]\n'
             '\t},\n'
@@ -159,10 +165,12 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             '\t\t\t\t"name": "Space World (Can be omitted and derived from attribute nice name, required if no attribute name)",\n'
             '\t\t\t\t"attributeName": "InternalAttributeName (Not Nice Name but internal script name, omit for first base space if no attribute associated with space)",\n'
             '\t\t\t\t"transformName": "|LongName|COG_CTRL_rot__space_world__LOC"\n'
+            '\t\t\t\t"defaultAttributeValue": 1\n'
             '\t\t\t},\n'
             '\t\t\t{\n'
             '\t\t\t\t"attributeName": "InternalAttributeName 2 (Not Nice Name but internal script name)",\n'
             '\t\t\t\t"transformName": "|LongName|COG_CTRL_rot__space_rig_main__LOC"\n'
+            '\t\t\t\t"defaultAttributeValue": 0\n'
             '\t\t\t}\n'
             '\t\t]\n'
             '\t}\n'
@@ -184,6 +192,20 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             return False
 
         return True
+
+    def updateDefaultAttributeValuesPressed(self):
+        # Force a refresh
+        self.setSelectedControl(self.selectedControl)
+
+        if not self.validate():
+            QtWidgets.QMessageBox.information(self, 'Error', 'JSON Validation Failed on current configuration')
+            return
+
+        model: ILLMayaSpaceSwitcherModel.Spaces = ILLMayaSpaceSwitcherModel.Spaces.fromJsonStr(self.selectedControl, self.te_jsonContents.toPlainText(), rawJson=True)
+        model.updateDefaultAttributeValues()
+
+        self.te_jsonContents.setPlainText(model.getJsonString())
+
 
     def validatePressed(self):
         if self.validate():
@@ -232,9 +254,6 @@ class ILLMayaSpaceSwitcherConfiguration(QtWidgets.QWidget):
             self.te_selectedControlAttributes.setPlainText(attrsString)
 
     def setSelectedControl(self, selectedControl:str):
-        if self.selectedControl == selectedControl:
-            return
-
         self.selectedControl = selectedControl
 
         self.lbl_selectedControl.setText(f'Selected Control: {Util.getShortName(self.selectedControl)}')

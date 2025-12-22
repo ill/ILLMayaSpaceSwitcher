@@ -13,6 +13,7 @@ class Space:
     def __init__(self,
                  name: str = None,
                  attributeName: str = None,
+                 defaultAttributeValue: float = None,
                  transformName: str = None):
         self.parentSpaceGroup = None
 
@@ -22,18 +23,22 @@ class Space:
         # Internal name of the attribute, the non-nice name
         self.attributeName: str = attributeName
 
+        # The default value so we know what values to restore a control to when that is selected
+        self.defaultAttributeValue: float = defaultAttributeValue
+
         # The reference to the transform object in the scene
         self.transformName: str = transformName
 
     @classmethod
-    def fromJsonData(cls, controlName: str, jsonData: {}):
+    def fromJsonData(cls, controlName: str, jsonData: {}, rawJson: bool = False):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
         name = jsonData.get('name', None)
         attributeName = jsonData.get('attributeName', None)
+        defaultAttributeValue = float(jsonData.get('defaultAttributeValue', 0.0))
 
-        if name is None:
+        if name is None and not rawJson:
             if attributeName is None:
                 raise NameError(f'attributeName and name are both unspecified for space definition')
 
@@ -57,6 +62,7 @@ class Space:
 
         return cls(name=name,
                    attributeName=attributeName,
+                   defaultAttributeValue=defaultAttributeValue,
                    transformName=nameSpacedTransformName)
 
     def getJsonData(self) -> {}:
@@ -67,6 +73,9 @@ class Space:
 
         if self.attributeName is not None:
             res['attributeName'] = self.attributeName
+
+        if self.defaultAttributeValue is not None:
+            res['defaultAttributeValue'] = self.defaultAttributeValue
 
         if self.transformName is not None:
             res['transformName'] = self.transformName
@@ -123,6 +132,13 @@ class Space:
 
     def getControlRotationSpaceLocalRotationTransform(self):
         return self.parentSpaceGroup.getControlRotationSpaceLocalRotationTransform()
+
+    def updateDefaultAttributeValue(self):
+        if self.attributeName is None or not cmds.getAttr(f'{self.getControlName()}.{self.attributeName}', keyable=True):
+            self.defaultAttributeValue = None
+            return
+
+        self.defaultAttributeValue = cmds.getAttr(f'{self.getControlName()}.{self.attributeName}')
 
     # Switches to this space
     def switchToSpace(self, keyOptions: Util.KeyOptions):
@@ -263,14 +279,14 @@ class SpaceGroup:
             space.parentSpaceGroup = self
 
     @classmethod
-    def fromJsonData(cls, controlName: str, name: str, jsonData: {}):
+    def fromJsonData(cls, controlName: str, name: str, jsonData: {}, rawJson: bool = False):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
         definitionsJsonData = jsonData.get('Definitions', None)
 
         return cls(name=name,
-                   spaces=[Space.fromJsonData(controlName=controlName, jsonData=spaceDefinitionJsonData)
+                   spaces=[Space.fromJsonData(controlName=controlName, jsonData=spaceDefinitionJsonData, rawJson=rawJson)
                            for spaceDefinitionJsonData in definitionsJsonData] if definitionsJsonData is not None else None)
 
     def getJsonData(self) -> {}:
@@ -327,6 +343,10 @@ class SpaceGroup:
     def getControlRotationSpaceLocalRotationTransform(self):
         return self.parentSpaces.getControlRotationSpaceLocalRotationTransform()
 
+    def updateDefaultAttributeValues(self):
+        for space in self.spaces:
+            space.updateDefaultAttributeValue()
+
     # Gets the current state of all the attributes in the space group now
     def getAttributes(self) -> list[float]:
         return [space.getAttribute() for space in self.spaces]
@@ -369,16 +389,16 @@ class Spaces:
             return None
 
     @classmethod
-    def fromControl(cls, controlName: str):
+    def fromControl(cls, controlName: str, rawJson: bool = False):
         jsonStr = cls.getJsonStrFromControl(controlName=controlName)
-        return cls.fromJsonStr(controlName=controlName, jsonStr=jsonStr) if jsonStr is not None else None
+        return cls.fromJsonStr(controlName=controlName, jsonStr=jsonStr, rawJson=rawJson) if jsonStr is not None else None
 
     @classmethod
-    def fromJsonStr(cls, controlName: str, jsonStr: str):
-        return cls.fromJsonData(controlName=controlName, jsonData = json.loads(jsonStr)) if jsonStr is not None else None
+    def fromJsonStr(cls, controlName: str, jsonStr: str, rawJson: bool = False):
+        return cls.fromJsonData(controlName=controlName, jsonData = json.loads(jsonStr), rawJson=rawJson) if jsonStr is not None else None
 
     @classmethod
-    def fromJsonData(cls, controlName: str, jsonData: {}):
+    def fromJsonData(cls, controlName: str, jsonData: {}, rawJson: bool = False):
         if not Util.isLongName(controlName):
             raise NameError(f'Use long names only for control name "{controlName}"')
 
@@ -390,8 +410,8 @@ class Spaces:
             raise TypeError(f'Rotation spaces should only exist on joint type controls because it uses the joint orient to control the rotation space')
 
         return cls(controlName=controlName,
-                   spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData) if spacesJsonData is not None else None,
-                   rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData) if rotationSpacesJsonData is not None else None)
+                   spaces=SpaceGroup.fromJsonData(controlName=controlName, name='Spaces', jsonData=spacesJsonData, rawJson=rawJson) if spacesJsonData is not None else None,
+                   rotationSpaces=SpaceGroup.fromJsonData(controlName=controlName, name='Rotation Spaces', jsonData=rotationSpacesJsonData, rawJson=rawJson) if rotationSpacesJsonData is not None else None)
 
     def getJsonData(self) -> {}:
         res = {}
@@ -476,6 +496,13 @@ class Spaces:
                                  math.radians(controlRotationSpaceLocalRotation[1]),
                                  math.radians(controlRotationSpaceLocalRotation[2]),
                                  Util.getOmRotationOrder(self.controlName)).asMatrix()
+
+    def updateDefaultAttributeValues(self):
+        if self.spaces is not None:
+            self.spaces.updateDefaultAttributeValues()
+
+        if self.rotationSpaces is not None:
+            self.rotationSpaces.updateDefaultAttributeValues()
 
 
 class SpacesIntersectionSpace:

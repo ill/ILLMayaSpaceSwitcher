@@ -130,6 +130,30 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="hl_resttoreDefaults">
+     <item>
+      <widget class="QPushButton" name="btn_restoreDefaultAttributes">
+       <property name="toolTip">
+        <string>This sets all the space attribute values to their defaults. It's basically the zero rig configuration.</string>
+       </property>
+       <property name="text">
+        <string>Restore Default Space Attribute Values</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_restoreAndMatchDefaultAttributes">
+       <property name="toolTip">
+        <string>Does the same thing as &quot;Restore Default Space Attribute Values&quot; but keeps the controls in their world space positions by matching their transforms to the new space. Keep in mind controls may double transform so it's best to do this one at a time on controls if there are parent child relationships.</string>
+       </property>
+       <property name="text">
+        <string>Restore and Match Control to Default Attribute Values</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QScrollArea" name="sa_spacesList">
      <property name="widgetResizable">
       <bool>true</bool>
