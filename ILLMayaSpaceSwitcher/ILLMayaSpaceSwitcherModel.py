@@ -554,7 +554,7 @@ class SpacesIntersectionSpace:
         res: {str, om.MMatrix} = {}
 
         for space in self.spaces:
-            res[space.getControlName] = space.getControlWorldTransform()
+            res[space.getControlName()] = space.getControlWorldTransform()
 
         return res
 

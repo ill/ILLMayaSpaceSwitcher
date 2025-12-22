@@ -300,7 +300,7 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
                 self.spacesIntersection.restoreDefaultAttributes(keyOptions=self.getKeyOptions())
 
-                for control, worldTransform in controlWorldTransforms.items:
+                for control, worldTransform in controlWorldTransforms.items():
                     cmds.xform(control, matrix=list(worldTransform), worldSpace=True)
 
             Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Restore Default Attributes',

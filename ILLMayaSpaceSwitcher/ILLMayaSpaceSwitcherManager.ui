@@ -151,6 +151,16 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btn_restoreZeroAndMatchDefaultAttributes">
+       <property name="toolTip">
+        <string>This does the same thing as the other two, but also zeroes out all the space objects</string>
+       </property>
+       <property name="text">
+        <string>Restore, Zero, and Match Controls</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
