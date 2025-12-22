@@ -130,7 +130,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="hl_resttoreDefaults">
+    <layout class="QHBoxLayout" name="hl_restoreDefaults">
      <item>
       <widget class="QPushButton" name="btn_restoreDefaultAttributes">
        <property name="toolTip">

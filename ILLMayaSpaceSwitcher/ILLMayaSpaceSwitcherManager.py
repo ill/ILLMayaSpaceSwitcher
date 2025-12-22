@@ -217,6 +217,14 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
         # Step Tangent Keys Enabled Check Box
         self.cb_stepTangentKeysEnabled: QtWidgets.QCheckBox = self.widget.findChild(QtWidgets.QCheckBox, 'cb_stepTangentKeysEnabled')
 
+        # Restore Default Space Attribute Values Button
+        self.btn_restoreDefaultAttributes: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_restoreDefaultAttributes')
+        self.btn_restoreDefaultAttributes.clicked.connect(self.restoreDefaultAttributesPressed)
+
+        # Restore Default Space Attribute Values and Match Control Button
+        self.btn_restoreAndMatchDefaultAttributes: QtWidgets.QPushButton = self.widget.findChild(QtWidgets.QPushButton, 'btn_restoreAndMatchDefaultAttributes')
+        self.btn_restoreAndMatchDefaultAttributes.clicked.connect(self.restoreAndMatchDefaultAttributesPressed)
+
         # Spaces List Contents
         self.sa_spacesListContents: QtWidgets.QWidget = self.widget.findChild(QtWidgets.QWidget, 'sa_spacesListContents')
 
@@ -277,6 +285,16 @@ class ILLMayaSpaceSwitcherManager(QtWidgets.QWidget):
 
     def refreshPressed(self):
         self.setSelectedControls(selectedControls=Util.getSelectedTransforms())
+
+    def restoreDefaultAttributesPressed(self):
+        if self.spacesIntersection is not None:
+            def operation(keyOptions: Util.KeyOptions):
+                self.spacesIntersection.restoreDefaultAttributes(keyOptions=self.getKeyOptions())
+
+            Util.performOperation(operation, undoChunkName='ILL Maya Space Switcher Restore Default Attributes', keyOptions=self.getKeyOptions())
+
+    def restoreAndMatchDefaultAttributesPressed(self):
+        pass
 
     def setSelectedControls(self, selectedControls:list[str]):
         if self.selectedControls == selectedControls:

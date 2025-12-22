@@ -255,6 +255,10 @@ class Space:
 
             Util.keyTransform(node=self.transformName, keyOptions=keyOptions, originalValues=originalTransformAttributes)
 
+    def restoreDefaultAttribute(self, keyOptions: Util.KeyOptions):
+        if self.defaultAttributeValue is not None:
+            self.setAttribute(self.defaultAttributeValue, keyOptions)
+
 
 # A space group represents the list of spaces that can be switched between
 # Usually you have a normal spaces group and a rotation spaces group
@@ -546,6 +550,10 @@ class SpacesIntersectionSpace:
         for space in self.spaces:
             space.zeroTransform(keyOptions=keyOptions)
 
+    def restoreDefaultAttributes(self, keyOptions: Util.KeyOptions):
+        for space in self.spaces:
+            space.restoreDefaultAttribute(keyOptions=keyOptions)
+
 
 class SpacesIntersectionGroup:
     def __init__(self, parentSpacesIntersection, name: str = ''):
@@ -592,6 +600,10 @@ class SpacesIntersectionGroup:
                 if not didFind:
                     del self.spaces[orderedSpaceNamesIndex]
                     spaceIndex = preSearchSpaceIndex
+
+    def restoreDefaultAttributes(self, keyOptions: Util.KeyOptions):
+        for space in self.spaces:
+            space.restoreDefaultAttributes(keyOptions=keyOptions)
 
 
 # When working with multiple selected controls, this tracks the intersection of the set of what the selected spaces are among the objects as long as their space names match and are in the same order
@@ -648,3 +660,9 @@ class SpacesIntersection:
         else:
             self.rotationSpacesIntersectionGroup = None
 
+    def restoreDefaultAttributes(self, keyOptions: Util.KeyOptions):
+        if self.spacesIntersectionGroup is not None:
+            self.spacesIntersectionGroup.restoreDefaultAttributes(keyOptions=keyOptions)
+
+        if self.rotationSpacesIntersectionGroup is not None:
+            self.rotationSpacesIntersectionGroup.restoreDefaultAttributes(keyOptions=keyOptions)
