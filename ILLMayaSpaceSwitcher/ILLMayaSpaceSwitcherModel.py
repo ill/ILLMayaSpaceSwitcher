@@ -550,6 +550,14 @@ class SpacesIntersectionSpace:
         for space in self.spaces:
             space.zeroTransform(keyOptions=keyOptions)
 
+    def getControlWorldTransforms(self) -> {str, om.MMatrix}:
+        res: {str, om.MMatrix} = {}
+
+        for space in self.spaces:
+            res[space.getControlName] = space.getControlWorldTransform()
+
+        return res
+
     def restoreDefaultAttributes(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
             space.restoreDefaultAttribute(keyOptions=keyOptions)
@@ -600,6 +608,14 @@ class SpacesIntersectionGroup:
                 if not didFind:
                     del self.spaces[orderedSpaceNamesIndex]
                     spaceIndex = preSearchSpaceIndex
+
+    def getControlWorldTransforms(self) -> {str, om.MMatrix}:
+        res: {str, om.MMatrix} = {}
+
+        for space in self.spaces:
+            res.update(space.getControlWorldTransforms())
+
+        return res
 
     def restoreDefaultAttributes(self, keyOptions: Util.KeyOptions):
         for space in self.spaces:
@@ -659,6 +675,17 @@ class SpacesIntersection:
             self.rotationSpacesIntersectionGroup.evaluateGroups([space.rotationSpaces for space in self.spaces])
         else:
             self.rotationSpacesIntersectionGroup = None
+
+    def getControlWorldTransforms(self) -> {str, om.MMatrix}:
+        res: {str, om.MMatrix} = {}
+
+        if self.spacesIntersectionGroup is not None:
+            res.update(self.spacesIntersectionGroup.getControlWorldTransforms())
+
+        if self.rotationSpacesIntersectionGroup is not None:
+            res.update(self.spacesIntersectionGroup.getControlWorldTransforms())
+
+        return res
 
     def restoreDefaultAttributes(self, keyOptions: Util.KeyOptions):
         if self.spacesIntersectionGroup is not None:
